@@ -1,0 +1,219 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 200;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.container {
+    padding: 2rem;
+}
+
+.container--header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container--logo {
+    border: 5px solid tomato;
+    width: 12rem;
+    text-align: center;
+    cursor: default;
+}
+
+.container--nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav-item {
+    color: red;
+}
+
+.nav-item:not(:last-child) {
+    margin-right: 2rem;
+}
+
+.container--form {
+    padding: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    width: 36rem;
+    height: 30rem;
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#formQuestion {
+    width: 100%;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+#formOptions {
+    width: 16rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-options {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-options-long {
+    height: 340px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+#formOptions > .option {
+    border: 2px solid red;
+    background-color: inherit;
+    width: 90%;
+    padding: 1rem 2rem;
+    text-align: center;
+    border-radius: .25rem;
+}
+
+#formOptions > .option:hover {
+    background-color: #ffbb9e;
+    cursor: pointer;
+}
+
+#formOptions > .option:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+#formOptions > .option-long {
+    border: 2px solid red;
+    background-color: inherit;
+    padding: 1rem 2rem;
+    width: 50%;
+    text-align: center;
+    font-size: .6rem;
+    border-radius: .25rem;
+}
+
+#formOptions > .option-long:hover {
+    background-color: #ffbb9e;
+}
+
+#formOptions > .option-long:not(:last-child) {
+    margin-bottom: .5rem;
+}
+
+#formOptions > .option-long:nth-child(odd) {
+    margin-right: .5rem;
+}
+
+.button--nav {
+    border: none;
+    background-color: red;
+    padding: .5rem 1rem;
+    border-radius: .25rem;
+    color: white;
+}
+
+.button--nav:hover {
+    background-color: #ffbb9e;
+}
+
+#backBtn {
+    position: absolute;
+    bottom: 1rem;
+    left: 2rem;
+}
+
+#nextBtn {
+    position: absolute;
+    bottom: 1rem;
+    right: 2rem;
+}
+
+.completion-bar--top {
+    background-color: red;
+    height: .5rem;
+    width: 0%;
+    position: absolute;
+    left: 0;
+    z-index: 10;
+}
+
+.completion-bar--bot {
+    background-color: #ffbb9e;
+    height: .5rem;
+    width: 100%;
+    position: absolute;
+}
+
+.container--presentation {
+    height: 60vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.presentation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    width: 36rem;
+    height: 30rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.input--wrapper {
+    border: 2px solid red;
+    border-radius: .25rem;
+    padding: 1rem .5rem;
+    cursor: text;
+}
+
+.input {
+    border: none;
+    margin-left: .5rem;
+}
+
+.input:focus {
+    outline-width: 0;
+}
+
+#formOptions > [type=checkbox] {
+    display: inline-block;
+}
+
+#formOptions > input[type=checkbox]:not(:last-child) {
+    margin-bottom: .5rem;
+}
+
+.checkbox--wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
