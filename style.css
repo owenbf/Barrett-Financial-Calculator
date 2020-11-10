@@ -204,6 +204,16 @@ a {
     outline-width: 0;
 }
 
+.purchase-input {
+    border: 2px solid red;
+    border-radius: .25rem;
+    padding: .5rem;
+}
+
+.purchase-input:not(:last-child) {
+    margin-bottom: .5rem;
+}
+
 #formOptions > [type=checkbox] {
     display: inline-block;
 }

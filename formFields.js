@@ -225,6 +225,7 @@ export let formFields = [
 ];
 
 export let purchasePaymentField = {
+    "text": "",
     "text1": "Purchase price:",
     "text2": "Down payment:",
     "type": "newPurchase",

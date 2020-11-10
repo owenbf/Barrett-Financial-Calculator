@@ -35,7 +35,7 @@ function styleOptions() {
     currentQuestion = getCurrentQuestion();
     formOptions.classList.remove('form-options-long');
     formOptions.classList.remove('form-options');
-    if ('options-long' in currentQuestion) {
+    if (currentQuestion['type'] === 'options-long') {
         formOptions.classList.add('form-options-long');
     } else {
         formOptions.classList.add('form-options');
@@ -128,8 +128,31 @@ function handleTypeOptionsLong(question) {
     }
 }
 
+// THIS IS A WIP
 function handleTypeNewPurchase(question) {
+    if (question['type'] === 'newPurchase') {
+        let text1 = question['text1'];
+        let text2 = question['text2'];
 
+        let label1 = document.createElement('h3');
+        let label2 = document.createElement('h3');
+        label1.innerHTML = text1;
+        label2.innerHTML = text2;
+
+        let input1 = document.createElement('input');
+        let input2 = document.createElement('input');
+        let input3 = document.createElement('input');
+
+        input1.classList.add('purchase-input');
+        input2.classList.add('purchase-input');
+        input3.classList.add('purchase-input');
+
+        formOptions.appendChild(label1);
+        formOptions.appendChild(input1);
+        formOptions.appendChild(label2);
+        formOptions.appendChild(input2);
+        formOptions.appendChild(input3);
+    }
 }
 
 function handleTypeTextfield(question) {
@@ -170,8 +193,10 @@ function handleTypeCheckboxes(question) {
 
 function handlePurchaseCase() {
     if (answers['refinanceOrPurchase'] === 'purchase' && !(isPurchaseUpdated)) {
-        formFields.splice(6, 1, newPurchaseField);
+        formFields.splice(6, 1, purchasePaymentField);
+        formFields.splice(7, 2); // I MAY NEED TO SAVE THIS TO REVERSE PURCHASE SELECTION
         isPurchaseUpdated = true;
+        questionCount = Object.keys(formFields).length;
     }
 }
 
