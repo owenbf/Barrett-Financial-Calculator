@@ -186,52 +186,61 @@ export let formFields = [
         "fields": [
             {
                 "text": "30 Yr Fixed",
-                "name": "30yrfixed",
-                "value": "30yrfixed"
+                "name": "30yrfixed"
             },
             {
                 "text": "25 Yr Fixed",
-                "name": "25yrfixed",
-                "value": "25yrfixed"
+                "name": "25yrfixed"
             },
             {
                 "text": "20 Yr Fixed",
-                "name": "20yrfixed",
-                "value": "20yrfixed"
+                "name": "20yrfixed"
             },
             {
                 "text": "15 Yr Fixed",
-                "name": "15yrfixed",
-                "value": "15yrfixed"
+                "name": "15yrfixed"
             },
             {
                 "text": "10 Yr Fixed",
-                "name": "10yrfixed",
-                "value": "10yrfixed"
+                "name": "10yrfixed"
             },
             {
                 "text": "10 Yr ARM",
-                "name": "10yrarm",
-                "value": "10yrarm"
+                "name": "10yrarm"
             },
             {
                 "text": "7 Yr ARM",
-                "name": "7yrarm",
-                "value": "7yrarm"
+                "name": "7yrarm"
             },
             {
                 "text": "5 Yr ARM",
-                "name": "5yrarm",
-                "value": "5yrarm"
+                "name": "5yrarm"
             },
             {
                 "text": "3 Yr ARM",
-                "name": "3yrarm",
-                "value": "3yrarm"
+                "name": "3yrarm"
             }
         ]
     }
 ];
+
+export let purchasePaymentField = {
+    "text1": "Purchase price:",
+    "text2": "Down payment:",
+    "type": "newPurchase",
+    "name": "remainingMortgageBalance",
+    "fields": [
+        {
+            "textType": "money"
+        },
+        {
+            "textType": "money"
+        },
+        {
+            "textType": "percentage"
+        }
+    ]
+}
 
 export let militaryFields = [
     {

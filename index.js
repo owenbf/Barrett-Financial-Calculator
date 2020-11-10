@@ -1,4 +1,4 @@
-import { formFields, militaryFields } from './formFields.js'
+import { formFields, purchasePaymentField, militaryFields } from './formFields.js'
 
 let questionCount = Object.keys(formFields).length;
 let currentQuestion;
@@ -6,6 +6,7 @@ let currentQuestionIndex = 0;
 let answers = {};
 let militaryAdded = false;
 let VAAdded = false;
+let isPurchaseUpdated = false;
 
 display();
 nextBtn.onclick = function() { next() };
@@ -41,13 +42,7 @@ function styleOptions() {
     }
 }
 
-function collectInput(question) {
-    currentQuestion = getCurrentQuestion();
-    getTextfieldInput(question);
-    getCheckboxesInput(question);
-}
-
-function getTextfieldInput(question) {
+function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
         let currentValue = currentInputField.value;
@@ -56,8 +51,16 @@ function getTextfieldInput(question) {
     }
 }
 
-function getCheckboxesInput(question) {
-
+function getCheckboxInput() {
+    if (document.querySelector('.checkboxField:checked')) {
+        let checkedValues = document.querySelectorAll('.checkboxField:checked');
+        let name = 'loanTerms';
+        let loanTerms = [];
+        for (let item of checkedValues) {
+            loanTerms.push(item.id);
+        }
+        updateAnswers(name, loanTerms);
+    }
 }
 
 function displayFields() {
@@ -69,6 +72,7 @@ function displayFields() {
 function handleFields(question) {
     handleTypeOptions(question);
     handleTypeOptionsLong(question);
+    handleTypeNewPurchase(question);
     handleTypeTextfield(question);
     handleTypeCheckboxes(question);
 }
@@ -124,8 +128,11 @@ function handleTypeOptionsLong(question) {
     }
 }
 
+function handleTypeNewPurchase(question) {
+
+}
+
 function handleTypeTextfield(question) {
-    let fields = question['fields'];
     if (question['type'] === 'textfield') {
         let label = document.createElement('label');
         let input = document.createElement('input');
@@ -146,13 +153,14 @@ function handleTypeCheckboxes(question) {
         checkboxWrapper.classList.add('checkbox--wrapper');
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
-            let name = question['name'];
+            let name = fields[i]['name'];
             let box = document.createElement('input');
             let label = document.createElement('label');
             label.innerHTML = text;
             label.htmlFor = name;
             box.type = 'checkbox';
             box.id = name;
+            box.classList.add('checkboxField');
             label.appendChild(box);
             checkboxWrapper.appendChild(label);
         }
@@ -160,9 +168,15 @@ function handleTypeCheckboxes(question) {
     }
 }
 
-function handleInitialMilitaryCase() {
+function handlePurchaseCase() {
+    if (answers['refinanceOrPurchase'] === 'purchase' && !(isPurchaseUpdated)) {
+        formFields.splice(6, 1, newPurchaseField);
+        isPurchaseUpdated = true;
+    }
+}
+
+function handleMilitaryCase() {
     if (answers['isMilitary'] && !(militaryAdded)) {
-        console.log('testing');
         formFields.splice(4, 0, militaryFields[0]);
         formFields.splice(5, 0, militaryFields[2]);
         militaryAdded = true;
@@ -183,11 +197,10 @@ function validate(question) {
 }
 
 function next() {
+    handlePurchaseCase();
     getTextfieldInput();
-    handleInitialMilitaryCase(); // This only needs to run once
+    handleMilitaryCase();
     handleVALoanCase();
-    // Need to recalculate maxquestions
-
     // Insert something here to validate input
 
     if (currentQuestionIndex <= questionCount) {
@@ -198,6 +211,7 @@ function next() {
 
 function back() {
     getTextfieldInput();
+    getCheckboxInput();
     // Insert something here to validate input
 
     if (currentQuestionIndex > 0) {
@@ -224,7 +238,10 @@ function displayNextBack() {
     }
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
-        nextBtn.onclick = function() { present() };
+        nextBtn.onclick = function() {
+            getCheckboxInput();
+            present();
+        };
 
         // Add code that makes button trigger api request
     }
