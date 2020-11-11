@@ -91,36 +91,7 @@ export let formFields = [
             }
         ]
     },
-    {
-        "text": "What is the estimated property value?",
-        "type": "textfield",
-        "name": "propertyValue",
-        "fields": [
-            {
-                "textType": "money"
-            }
-        ]
-    },
-    {
-        "text": "What is the remaining balance of your mortgage?",
-        "type": "textfield",
-        "name": "remainingMortgageBalance",
-        "fields": [
-            {
-                "textType": "money"
-            }
-        ]
-    },
-    {
-        "text": "Would you like to borrow cash? How much?",
-        "type": "textfield",
-        "name": "borrowAmount",
-        "fields": [
-            {
-                "textType": "money"
-            }
-        ]
-    },
+    
     {
         "text": "What is your estimated credit score?",
         "type": "options-long",
@@ -242,6 +213,40 @@ export let purchasePaymentField = {
         }
     ]
 }
+
+export let refinancePaymentField = {
+    "text": "What is the estimated property value?",
+    "type": "textfield",
+    "name": "propertyValue",
+    "fields": [
+        {
+            "textType": "money"
+        }
+    ]
+}
+
+export let refinanceQuestions = [
+    {
+        "text": "What is the remaining balance of your mortgage?",
+        "type": "textfield",
+        "name": "remainingMortgageBalance",
+        "fields": [
+            {
+                "textType": "money"
+            }
+        ]
+    },
+    {
+        "text": "Would you like to borrow cash? How much?",
+        "type": "textfield",
+        "name": "borrowAmount",
+        "fields": [
+            {
+                "textType": "money"
+            }
+        ]
+    }
+]
 
 export let militaryFields = [
     {

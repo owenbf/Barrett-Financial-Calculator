@@ -1,4 +1,4 @@
-import { formFields, purchasePaymentField, militaryFields } from './formFields.js'
+import { formFields, purchasePaymentField, refinancePaymentField, refinanceQuestions, militaryFields } from './formFields.js'
 
 let questionCount = Object.keys(formFields).length;
 let currentQuestion;
@@ -131,6 +131,9 @@ function handleTypeOptionsLong(question) {
 // THIS IS A WIP
 function handleTypeNewPurchase(question) {
     if (question['type'] === 'newPurchase') {
+        let paymentWrapper = document.createElement('div');
+        paymentWrapper.classList.add('payment--wrapper');
+
         let text1 = question['text1'];
         let text2 = question['text2'];
 
@@ -147,11 +150,12 @@ function handleTypeNewPurchase(question) {
         input2.classList.add('purchase-input');
         input3.classList.add('purchase-input');
 
-        formOptions.appendChild(label1);
-        formOptions.appendChild(input1);
-        formOptions.appendChild(label2);
-        formOptions.appendChild(input2);
-        formOptions.appendChild(input3);
+        paymentWrapper.appendChild(label1);
+        paymentWrapper.appendChild(input1);
+        paymentWrapper.appendChild(label2);
+        paymentWrapper.appendChild(input2);
+        paymentWrapper.appendChild(input3);
+        formOptions.appendChild(paymentWrapper);
     }
 }
 
@@ -193,10 +197,15 @@ function handleTypeCheckboxes(question) {
 
 function handlePurchaseCase() {
     if (answers['refinanceOrPurchase'] === 'purchase' && !(isPurchaseUpdated)) {
-        formFields.splice(6, 1, purchasePaymentField);
-        formFields.splice(7, 2); // I MAY NEED TO SAVE THIS TO REVERSE PURCHASE SELECTION
+        formFields.splice(6, 0, purchasePaymentField);
         isPurchaseUpdated = true;
-        questionCount = Object.keys(formFields).length;
+    }
+    if (answers['refinanceOrPurchase'] === 'refinance' && !(isPurchaseUpdated)) {
+        formFields.splice(6, 0, refinancePaymentField);
+        for (let i = 0; i < refinanceQuestions.length; i++) {
+            formFields.splice(7+i, 0, refinanceQuestions[i]);
+        }
+        isPurchaseUpdated = true;
     }
 }
 
@@ -205,7 +214,6 @@ function handleMilitaryCase() {
         formFields.splice(4, 0, militaryFields[0]);
         formFields.splice(5, 0, militaryFields[2]);
         militaryAdded = true;
-        questionCount = Object.keys(formFields).length;
     }
 }
 
@@ -213,7 +221,6 @@ function handleVALoanCase() {
     if (answers['isVALoan'] !== undefined && !(answers['isVALoan']) && !(VAAdded)) {
         formFields.splice(5, 0, militaryFields[1]);
         VAAdded = true;
-        questionCount = Object.keys(formFields).length;
     }
 }
 
@@ -232,6 +239,7 @@ function next() {
         currentQuestionIndex++;
         display()
     }
+    questionCount = Object.keys(formFields).length;
 }
 
 function back() {
@@ -280,7 +288,7 @@ function showProgress() {
 }
 
 function incrementOnKeypress(event) {
-    if (event.which === 13) { //this now looks to see if you hit "enter"/"return"
+    if (event.which === 13) { // checks for enter/return keypress
         next();
     }
 }
