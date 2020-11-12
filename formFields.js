@@ -86,7 +86,6 @@ export let formFields = [
         "name": "zip",
         "fields": [
             {
-                "placeholder": "90210",
                 "textType": "zip"
             }
         ]
