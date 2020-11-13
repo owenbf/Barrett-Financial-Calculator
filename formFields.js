@@ -252,6 +252,7 @@ export let militaryFields = [
         "text": "Thank you for your service! Is the loan you're refinancing a VA Loan?",
         "type": "options",
         "name": "isVALoan",
+        "from": "militaryFields",
         "fields": [
             {
                 "text": "Yes",
@@ -266,7 +267,8 @@ export let militaryFields = [
     {
         "text": "Is this 1st time use?",
         "type": "options",
-        "name": "isVAFirstTimeUse",
+        "name": "isVAFirstTime",
+        "from": "militaryFields",
         "fields": [
             {
                 "text": "Yes",
@@ -282,6 +284,7 @@ export let militaryFields = [
         "text": "Are you VA funding fee exempt?",
         "type": "options",
         "name": "isVAFundingFeeExempt",
+        "from": "militaryFields",
         "fields": [
             {
                 "text": "Yes",

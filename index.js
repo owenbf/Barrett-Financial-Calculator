@@ -4,9 +4,7 @@ let questionCount = Object.keys(formFields).length;
 let currentQuestion;
 let currentQuestionIndex = 0;
 let answers = {};
-let militaryAdded = false;
-let VAAdded = false;
-let purchaseUpdated = false;
+// Need to find a better solution for these boolean things
 
 display();
 nextBtn.onclick = function() { next() };
@@ -261,7 +259,6 @@ function limitCheckboxCount(limit) {
                 checkedcount += (checkboxes[i].checked) ? 1 : 0;
             }
             if (checkedcount > limit) {
-                console.log("You can select maximum of " + limit + " checkboxes.");
                 alert("You can select maximum of " + limit + " checkboxes.");						
                 this.checked = false;
 
@@ -273,32 +270,112 @@ function limitCheckboxCount(limit) {
 
 // For handling conditionals
 
-function handlePurchaseCase() {
-    if (answers['refinanceOrPurchase'] === 'purchase' && !(purchaseUpdated)) {
-        formFields.splice(6, 0, purchasePaymentField);
-        purchaseUpdated = true;
+function handleConditionals() {
+    handlePurchaseCase();
+    handleMilitaryCase();
+    handleVALoanCase();
+}
+
+function getKeyArray() {
+    let array = [];
+    for (let item of formFields) {
+        array.push(item['name']);
     }
-    if (answers['refinanceOrPurchase'] === 'refinance' && !(purchaseUpdated)) {
-        formFields.splice(6, 0, refinancePaymentField);
+    return array
+}
+
+// CURRENTLY WORKING ON THIS
+function handlePurchaseCase() {
+    let keys = getKeyArray();
+    let indexOfCreditScore = keys.indexOf('creditScore');
+    let mortgageQuestionExists = keys.includes('remainingMortgageBalance');
+
+    if (answers['refinanceOrPurchase'] === 'purchase' && !(mortgageQuestionExists)) {
+        formFields.splice(indexOfCreditScore, 0, purchasePaymentField);
+    }
+    if (answers['refinanceOrPurchase'] === 'refinance' && !(mortgageQuestionExists) && !(formFields.includes(refinancePaymentField))) {
+        // SOMETHING IN HERE IS SEEMS TO CAUSE PROBLEMS
+        formFields.splice(indexOfCreditScore, 0, refinancePaymentField);
         for (let i = 0; i < refinanceQuestions.length; i++) {
-            formFields.splice(7+i, 0, refinanceQuestions[i]);
+            formFields.splice(indexOfCreditScore+1+i, 0, refinanceQuestions[i]);
         }
-        purchaseUpdated = true;
     }
 }
 
 function handleMilitaryCase() {
-    if (answers['isMilitary'] && !(militaryAdded)) {
-        formFields.splice(4, 0, militaryFields[0]);
-        formFields.splice(5, 0, militaryFields[2]);
-        militaryAdded = true;
+    let keys = getKeyArray();
+    let indexOfMilitary = keys.indexOf('isMilitary');
+    let militaryQuestionsExist = keys.includes('isVALoan') || keys.includes('isVAFirstTime') || keys.includes('isVAFundingFeeExempt');
+    if (answers['isMilitary'] && !(militaryQuestionsExist)) {
+        formFields.splice(indexOfMilitary+1, 0, militaryFields[0]);
+        formFields.splice(indexOfMilitary+2, 0, militaryFields[2]);
     }
 }
 
+function reverseMilitaryCase() {
+    let keys = getKeyArray();
+    let indexOfMilitary = keys.indexOf('isMilitary');
+    let militaryQuestionsExist = keys.includes('isVALoan') || keys.includes('isVAFirstTime') || keys.includes('isVAFundingFeeExempt');
+    if (!(answers['isMilitary']) && militaryQuestionsExist) {
+        let newMilitaryFields = formFields.filter(field => field['from'] === 'militaryFields');
+        let l = newMilitaryFields.length;
+        formFields.splice(indexOfMilitary+1, l);
+    }
+}
+
+// CURRENTLY WORKING ON THIS
 function handleVALoanCase() {
-    if (answers['isVALoan'] !== undefined && !(answers['isVALoan']) && !(VAAdded)) {
-        formFields.splice(5, 0, militaryFields[1]);
-        VAAdded = true;
+    let keys = getKeyArray();
+    let indexOfisVALoan = keys.indexOf('isVALoan');
+    let firstTimeExists = keys.includes('isVAFirstTime');
+    let isVALoanInAnswers = 'isVALoan' in answers;
+    if (isVALoanInAnswers && !(answers['isVALoan']) && !(firstTimeExists)) {
+        formFields.splice(indexOfisVALoan+1, 0, militaryFields[1]);
+    }
+    if (isVALoanInAnswers && answers['isVALoan'] && firstTimeExists) {
+        let firstTimeIndex = keys.indexOf('isVAFirstTime');
+        formFields.splice(firstTimeIndex, 1);
+    }
+}
+
+// For removing things when they get changed
+
+function updateFields() {
+    replaceRefinanceFields();
+    replacePurchaseField();
+    reverseMilitaryCase();
+}
+
+function replaceRefinanceFields() {
+    let keys = getKeyArray();
+    let values = Object.values(answers);
+    if (keys.includes('propertyValue') && values.includes('purchase')) {
+        let indexOfPropertyValueField = keys.indexOf('propertyValue');
+        formFields.splice(indexOfPropertyValueField, 3, purchasePaymentField);
+    }
+}
+
+function replacePurchaseField() {
+    let keys = getKeyArray();
+    let values = Object.values(answers);
+
+    if (keys.includes('remainingMortgageBalance') && values.includes('refinance')) {
+        let indexOfMortgageBalanceField = keys.indexOf('remainingMortgageBalance');
+
+        if (!(refinanceQuestions.includes(refinancePaymentField)) && !(formFields.includes(refinancePaymentField))) {
+            refinanceQuestions.unshift(refinancePaymentField);
+        }
+
+        if (!(keys.includes('propertyValue'))) {
+            formFields.splice(indexOfMortgageBalanceField, 1);
+            for (let i = 0; i < refinanceQuestions.length; i++) {
+                formFields.splice(indexOfMortgageBalanceField+i, 0, refinanceQuestions[i]);
+            }    
+        }
+        
+        if (refinanceQuestions.includes(refinancePaymentField)) {
+            refinanceQuestions.splice(0, 1);
+        }
     }
 }
 
@@ -307,6 +384,7 @@ function handleVALoanCase() {
 function validate(question) {
     isValidated = false;
 
+    // add something here sometime
 
     return isValidated
 }
@@ -323,10 +401,9 @@ function validatePropertyValue() {
 // For handling next/back functionality
 
 function next() {
-    handlePurchaseCase();
+    handleConditionals();
+    updateFields();
     getTextfieldInput();
-    handleMilitaryCase();
-    handleVALoanCase();
     limitCheckboxCount(3);
     // Insert something here to validate input
 
