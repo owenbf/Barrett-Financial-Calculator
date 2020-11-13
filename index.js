@@ -168,6 +168,10 @@ function handleTypeNewPurchase(question) {
         addNumberFilterEventListener(input2);
         addNumberFilterEventListener(input3);
 
+        input1.id = 'purchasePrice';
+        input2.id = 'downpaymentAbsolute';
+        input3.id = 'downpaymentPercentage';
+
         input1.classList.add('purchase-input');
         input2.classList.add('purchase-input');
         input3.classList.add('purchase-input');
@@ -258,15 +262,55 @@ function limitCheckboxCount(limit) {
             for (let i = 0; i < checkboxes.length; i++) {
                 checkedcount += (checkboxes[i].checked) ? 1 : 0;
             }
-            if (checkedcount > limit) {
-                alert("You can select maximum of " + limit + " checkboxes.");						
-                this.checked = false;
-
-                // THIS BEHAVIOR NEEDS TO BE UPDATED
+            if (checkedcount === limit) {
+                for (let checkbox of checkboxes) {
+                    if (!(checkbox.checked)) {
+                        checkbox.disabled = true;
+                    }
+                }
+            } else {
+                for (let checkbox of checkboxes) {
+                    checkbox.disabled = false;
+                }
             }
         }
     }
 }
+
+// For the mortgage/downpayment auto-update field feature
+// WHERE I AM CURRENTLY WORKING
+// WILL NEED TO ATTACH THIS TO BUTTON CLICK EVENT LISTENER
+
+// I can add a keypress event listener to all inputs for this slide. All this function needs to do
+// is update every field based on info. Maybe tho i need a different listener for each button?
+function downpaymentAutogenFeature() {
+    let purchasePrice = getPurchasePrice();
+    let downpaymentAbsolute = getDownpaymentAbsolute();
+    let downpaymentPercentage = getDownpaymentPercentage();
+
+
+}
+
+function updateDownpaymentAbsoluteField() {
+
+}
+
+function updateDownpaymentPercentageField() {
+
+}
+
+function getPurchasePrice() {
+    return document.getElementById('purchasePrice').value;
+}
+
+function getDownpaymentAbsolute() {
+    return document.getElementById('downpaymentAbsolute').value;
+}
+
+function getDownpaymentPercentage() {
+    return document.getElementById('downpaymentPercentage').value;
+}
+
 
 // For handling conditionals
 
@@ -324,13 +368,13 @@ function reverseMilitaryCase() {
 function handleVALoanCase() {
     let keys = getKeyArray();
     let indexOfisVALoan = keys.indexOf('isVALoan');
-    console.log(indexOfisVALoan);
-
     let firstTimeExists = keys.includes('isVAFirstTime');
     let isVALoanInAnswers = 'isVALoan' in answers;
+
     if (isVALoanInAnswers && !(answers['isVALoan']) && !(firstTimeExists) && indexOfisVALoan > 0) {
         formFields.splice(indexOfisVALoan+1, 0, militaryFields[1]);
     }
+
     if (isVALoanInAnswers && answers['isVALoan'] && firstTimeExists) {
         let firstTimeIndex = keys.indexOf('isVAFirstTime');
         formFields.splice(firstTimeIndex, 1);
@@ -403,7 +447,6 @@ function next() {
     handleConditionals();
     updateFields();
     getTextfieldInput();
-    limitCheckboxCount(3);
     // Insert something here to validate input
 
     if (currentQuestionIndex <= questionCount) {
