@@ -284,7 +284,6 @@ function getKeyArray() {
     return array
 }
 
-// CURRENTLY WORKING ON THIS
 function handlePurchaseCase() {
     let keys = getKeyArray();
     let indexOfCreditScore = keys.indexOf('creditScore');
@@ -294,7 +293,6 @@ function handlePurchaseCase() {
         formFields.splice(indexOfCreditScore, 0, purchasePaymentField);
     }
     if (answers['refinanceOrPurchase'] === 'refinance' && !(mortgageQuestionExists) && !(formFields.includes(refinancePaymentField))) {
-        // SOMETHING IN HERE IS SEEMS TO CAUSE PROBLEMS
         formFields.splice(indexOfCreditScore, 0, refinancePaymentField);
         for (let i = 0; i < refinanceQuestions.length; i++) {
             formFields.splice(indexOfCreditScore+1+i, 0, refinanceQuestions[i]);
@@ -323,13 +321,14 @@ function reverseMilitaryCase() {
     }
 }
 
-// CURRENTLY WORKING ON THIS
 function handleVALoanCase() {
     let keys = getKeyArray();
     let indexOfisVALoan = keys.indexOf('isVALoan');
+    console.log(indexOfisVALoan);
+
     let firstTimeExists = keys.includes('isVAFirstTime');
     let isVALoanInAnswers = 'isVALoan' in answers;
-    if (isVALoanInAnswers && !(answers['isVALoan']) && !(firstTimeExists)) {
+    if (isVALoanInAnswers && !(answers['isVALoan']) && !(firstTimeExists) && indexOfisVALoan > 0) {
         formFields.splice(indexOfisVALoan+1, 0, militaryFields[1]);
     }
     if (isVALoanInAnswers && answers['isVALoan'] && firstTimeExists) {
