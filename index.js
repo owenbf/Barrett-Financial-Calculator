@@ -200,8 +200,32 @@ function addNumberFilterEventListener(input) {
     input.addEventListener('keypress', event => {
         if (!ZIP_ALLOWED_CHARS_REGEXP.test(event.key)) {
             event.preventDefault();
-          }
+        }
     });
+}
+
+function addCommaGenEventListener(input) {
+    input.addEventListener('keyup', event => {
+        //console.log('commad:', formatInteger(input.value));
+        //console.log('comma free:', formatInteger(input.value).replace(/,/g, ''));
+        let n = input.value.replace(/,/g, '');
+        input.value = formatInteger(n);
+    });
+}
+
+function formatInteger(n) {
+    let comma = ',';
+    n.replace(/,/g, '')
+    let a = n.split('');
+    a.reverse();
+    for (let i = 3; i < a.length; i+=4) {
+        if (a[i] !== comma) {
+            a.splice(i, 0, comma);
+        }
+    }
+    a.reverse();
+    let t = a.join('');
+    return t
 }
 
 function handleTypeTextfield(question) {
@@ -219,6 +243,7 @@ function handleTypeTextfield(question) {
             let span = document.createElement('span');
             span.innerHTML = '$';
             label.appendChild(span);
+            addCommaGenEventListener(input);
         }
 
         label.classList.add('input--wrapper');
@@ -262,7 +287,7 @@ function limitCheckboxCount(limit) {
             for (let i = 0; i < checkboxes.length; i++) {
                 checkedcount += (checkboxes[i].checked) ? 1 : 0;
             }
-            if (checkedcount === limit) {
+            if (checkedcount >= limit) {
                 for (let checkbox of checkboxes) {
                     if (!(checkbox.checked)) {
                         checkbox.disabled = true;
