@@ -192,7 +192,31 @@ function handleTypeNewPurchase(question) {
         paymentWrapper.appendChild(span3);
         paymentWrapper.appendChild(input3);
         formOptions.appendChild(paymentWrapper);
+
+        handleTypeNewPurchaseInteraction();
     }
+}
+
+function handleTypeNewPurchaseInteraction() {
+    let purchasePriceInput = document.getElementById('purchasePrice');
+    let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
+    let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+
+    purchasePriceInput.addEventListener('keyup', event => {
+        if (downpaymentAbsoluteInput.value) {
+            downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+        }
+    });
+    downpaymentAbsoluteInput.addEventListener('keyup', event => {
+        if (purchasePriceInput.value) {
+            downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+        }
+    });
+    downpaymentPercentageInput.addEventListener('keyup', event => {
+        if (purchasePriceInput.value) {
+            downpaymentAbsoluteInput.value = parseInt((downpaymentPercentageInput.value / 100) * purchasePriceInput.value);
+        }
+    });
 }
 
 function addNumberFilterEventListener(input) {
@@ -206,11 +230,15 @@ function addNumberFilterEventListener(input) {
 
 function addCommaGenEventListener(input) {
     input.addEventListener('keyup', event => {
-        //console.log('commad:', formatInteger(input.value));
-        //console.log('comma free:', formatInteger(input.value).replace(/,/g, ''));
         let n = input.value.replace(/,/g, '');
         input.value = formatInteger(n);
     });
+    // input.addEventListener('keydown', event => {
+    //     let n = input.value.replace(/,/g, '');
+    //     input.value = formatInteger2(n);
+    //     console.log(n);
+    // });
+
 }
 
 function formatInteger(n) {
@@ -227,6 +255,21 @@ function formatInteger(n) {
     let t = a.join('');
     return t
 }
+
+// function formatInteger2(n) {
+//     let comma = ',';
+//     n.replace(/,/g, '')
+//     let a = n.split('');
+//     a.reverse();
+//     for (let i = 2; i < a.length; i+=4) {
+//         if (a[i] !== comma) {
+//             a.splice(i, 0, comma);
+//         }
+//     }
+//     a.reverse();
+//     let t = a.join('');
+//     return t
+// }
 
 function handleTypeTextfield(question) {
     if (question['type'] === 'textfield') {
@@ -301,41 +344,6 @@ function limitCheckboxCount(limit) {
         }
     }
 }
-
-// For the mortgage/downpayment auto-update field feature
-// WHERE I AM CURRENTLY WORKING
-// WILL NEED TO ATTACH THIS TO BUTTON CLICK EVENT LISTENER
-
-// I can add a keypress event listener to all inputs for this slide. All this function needs to do
-// is update every field based on info. Maybe tho i need a different listener for each button?
-function downpaymentAutogenFeature() {
-    let purchasePrice = getPurchasePrice();
-    let downpaymentAbsolute = getDownpaymentAbsolute();
-    let downpaymentPercentage = getDownpaymentPercentage();
-
-
-}
-
-function updateDownpaymentAbsoluteField() {
-
-}
-
-function updateDownpaymentPercentageField() {
-
-}
-
-function getPurchasePrice() {
-    return document.getElementById('purchasePrice').value;
-}
-
-function getDownpaymentAbsolute() {
-    return document.getElementById('downpaymentAbsolute').value;
-}
-
-function getDownpaymentPercentage() {
-    return document.getElementById('downpaymentPercentage').value;
-}
-
 
 // For handling conditionals
 
