@@ -43,15 +43,27 @@ function styleOptions() {
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
-        let currentValue = currentInputField.value;
+        let currentValue = parseInt(currentInputField.value.replace(/,/g, ''));
         let currentName = currentInputField.name;
         updateAnswers(currentName, currentValue);
     }
 }
 
+function getNewPurchaseInput() {
+    if (document.getElementById('purchasePrice')) {
+        let purchasePriceInput = document.getElementById('purchasePrice');
+        let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
+        let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+
+        updateAnswers('purchasePrice', purchasePriceInput.value);
+        updateAnswers('downpaymentAbsolute', downpaymentAbsoluteInput.value);
+        updateAnswers('downpaymentPercentage', downpaymentPercentageInput.value);
+    }
+}
+
 function getCheckboxInput() {
-    if (document.querySelector('.checkboxField:checked')) {
-        let checkedValues = document.querySelectorAll('.checkboxField:checked');
+    if (document.querySelector('.checkbox-field:checked')) {
+        let checkedValues = document.querySelectorAll('.checkbox-field:checked');
         let name = 'loanTerms';
         let loanTerms = [];
         for (let item of checkedValues) {
@@ -69,6 +81,7 @@ function displayFields() {
 
 // For handling various question types
 // and updating answers dictionary
+// THIS IS WHERE I NEED TO ADD STATE MANAGEMENT
 
 function handleFields(question) {
     handleTypeOptions(question);
@@ -93,7 +106,18 @@ function handleTypeOptions(question) {
             btn.innerHTML = text;
             btn.value = value;
             btn.type = 'button';
+            btn.classList.add(name);
             btn.classList.add('option');
+
+            if (answers[name] === btn.value) {
+                btn.classList.add('selected');
+            }
+            if (typeof answers[name] === 'boolean') {
+                if (answers[name].toString() === btn.value.toString()) {
+                    btn.classList.add('selected');
+                }
+            }
+
             btn.onclick = function() {
                 let buttons = document.getElementsByClassName('option');
                 for (let button of buttons) {
@@ -101,7 +125,7 @@ function handleTypeOptions(question) {
                 }
                 updateAnswers(name, value);
                 btn.classList.add('selected');
-                //next();  THIS LINE MAY CHANGE
+                //next(); THIS LINE MAY CHANGE
             };
             formOptions.appendChild(btn);
         }
@@ -122,6 +146,13 @@ function handleTypeOptionsLong(question) {
             btnText.innerHTML = text;
             btnSubtext.innerHTML = subtext;
             btn.type = 'button';
+            btn.value = value;
+
+            let keys = getKeyArray();
+            if (keys.includes(name) && answers[name] === btn.value) {
+                btn.classList.add('selected');
+            }
+
             btn.onclick = function () {
                 let buttons = document.getElementsByClassName('option-long');
                 for (let button of buttons) {
@@ -180,6 +211,9 @@ function handleTypeNewPurchase(question) {
         input2.maxLength = 15;
         input3.maxLength = 2;
 
+        //addCommaGenEventListener(input1);
+        //addCommaGenEventListener(input2);
+        
         let spacer = document.createElement('div');
 
         paymentWrapper.appendChild(label1);
@@ -194,6 +228,7 @@ function handleTypeNewPurchase(question) {
         formOptions.appendChild(paymentWrapper);
 
         handleTypeNewPurchaseInteraction();
+        handleTypeNewPurchaseSaveState();
     }
 }
 
@@ -219,6 +254,24 @@ function handleTypeNewPurchaseInteraction() {
     });
 }
 
+function handleTypeNewPurchaseSaveState() {
+    let purchasePriceInput = document.getElementById('purchasePrice');
+    let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
+    let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+
+    if ('purchasePrice' in answers) {
+        purchasePriceInput.value = answers['purchasePrice'];
+    }
+
+    if ('downpaymentAbsolute' in answers) {
+        downpaymentAbsoluteInput.value = answers['downpaymentAbsolute'];
+    }
+
+    if ('downpaymentPercentage' in answers) {
+        downpaymentPercentageInput.value = answers['downpaymentPercentage'];
+    }
+}
+
 function addNumberFilterEventListener(input) {
     const ZIP_ALLOWED_CHARS_REGEXP = new RegExp('^[0-9]*$');
     input.addEventListener('keypress', event => {
@@ -227,6 +280,10 @@ function addNumberFilterEventListener(input) {
         }
     });
 }
+
+// THIS IS A WIP
+// THIS IS A WIP
+// THIS IS A WIP
 
 function addCommaGenEventListener(input) {
     input.addEventListener('keyup', event => {
@@ -238,7 +295,6 @@ function addCommaGenEventListener(input) {
     //     input.value = formatInteger2(n);
     //     console.log(n);
     // });
-
 }
 
 function formatInteger(n) {
@@ -286,7 +342,7 @@ function handleTypeTextfield(question) {
             let span = document.createElement('span');
             span.innerHTML = '$';
             label.appendChild(span);
-            addCommaGenEventListener(input);
+            //addCommaGenEventListener(input);
         }
 
         label.classList.add('input--wrapper');
@@ -296,6 +352,10 @@ function handleTypeTextfield(question) {
         input.pattern = '[a-z]{1,15}';
         label.appendChild(input);
         formOptions.appendChild(label);
+
+        if (name in answers) {
+            input.value = answers[name];
+        }
     }
 }
 
@@ -304,6 +364,7 @@ function handleTypeCheckboxes(question) {
     if (question['type'] === 'checkboxes') {
         let checkboxWrapper = document.createElement('div');
         checkboxWrapper.classList.add('checkbox--wrapper');
+        let answerName = question['name']
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let name = fields[i]['name'];
@@ -316,6 +377,12 @@ function handleTypeCheckboxes(question) {
             box.classList.add('checkbox-field');
             label.appendChild(box);
             checkboxWrapper.appendChild(label);
+            
+            if (answerName in answers && answers[answerName].includes(name)) {
+                box.checked = true;
+            } else if (answerName in answers && answers[answerName].length === 3) {
+                box.disabled = true;
+            }
         }
         formOptions.appendChild(checkboxWrapper);
         limitCheckboxCount(3);
@@ -480,6 +547,7 @@ function next() {
     handleConditionals();
     updateFields();
     getTextfieldInput();
+    getNewPurchaseInput();
     // Insert something here to validate input
 
     if (currentQuestionIndex <= questionCount) {
@@ -487,16 +555,19 @@ function next() {
         display()
     }
     questionCount = Object.keys(formFields).length;
+
+    //console.log(answers);
 }
 
 function back() {
     getTextfieldInput();
     getCheckboxInput();
+    getNewPurchaseInput();
     // Insert something here to validate input
 
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
-        display()
+        display();
     }
 }
 
@@ -512,12 +583,16 @@ function displayNextBack() {
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
         nextBtn.onclick = function() {
-            getCheckboxInput();
-            present();
+            submit();
         };
 
         // Add code that makes button trigger api request
     }
+}
+
+function submit() {
+    getCheckboxInput();
+    present();
 }
 
 function present() {
@@ -536,7 +611,11 @@ function showProgress() {
 
 function incrementOnKeypress(event) {
     if (event.which === 13) { // checks for enter/return keypress
-        next();
+        if (currentQuestionIndex+1 >= questionCount) {
+            submit();
+        } else {
+            next();
+        }
     }
 }
 

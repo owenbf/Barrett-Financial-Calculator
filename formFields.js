@@ -144,7 +144,7 @@ export let formFields = [
             {
                 "text": "Fair",
                 "subtext": "599 & below",
-                "value": "fair+"
+                "value": "fair"
             }
         ]
     },
