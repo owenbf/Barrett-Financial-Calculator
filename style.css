@@ -233,6 +233,7 @@ a {
 .payment--wrapper {
     transform: translateY(-4rem);
     text-align: center;
+    position: relative;
 }
 
 .payment--wrapper > span {
@@ -242,4 +243,15 @@ a {
 
 .selected {
     background-color: lightcyan !important;
+}
+
+#remainingMortgageWarning {
+    transform: translateY(5rem);
+    text-align: center;
+}
+
+.warning {
+    font-size: .8rem;
+    position: absolute;
+    color: red;
 }

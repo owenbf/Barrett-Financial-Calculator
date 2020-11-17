@@ -43,7 +43,7 @@ function styleOptions() {
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
-        let currentValue = parseInt(currentInputField.value.replace(/,/g, ''));
+        let currentValue = filterCommaNumber(currentInputField.value);
         let currentName = currentInputField.name;
         updateAnswers(currentName, currentValue);
     }
@@ -81,7 +81,6 @@ function displayFields() {
 
 // For handling various question types
 // and updating answers dictionary
-// THIS IS WHERE I NEED TO ADD STATE MANAGEMENT
 
 function handleFields(question) {
     handleTypeOptions(question);
@@ -89,6 +88,7 @@ function handleFields(question) {
     handleTypeNewPurchase(question);
     handleTypeTextfield(question);
     handleTypeCheckboxes(question);
+    handleRemainingMortgageWarning(question)
 }
 
 function updateAnswers(label, value) {
@@ -153,6 +153,7 @@ function handleTypeOptionsLong(question) {
                 btn.classList.add('selected');
             }
 
+            // State management
             btn.onclick = function () {
                 let buttons = document.getElementsByClassName('option-long');
                 for (let button of buttons) {
@@ -191,6 +192,10 @@ function handleTypeNewPurchase(question) {
         let span2 = document.createElement('span');
         let span3 = document.createElement('span');
 
+        let warning = document.createElement('div');
+        warning.id = 'newPurchaseWarning';
+        warning.classList.add('warning');
+
         span1.innerHTML = '$';
         span2.innerHTML = '$';
         span3.innerHTML = '%';
@@ -203,6 +208,9 @@ function handleTypeNewPurchase(question) {
         input2.id = 'downpaymentAbsolute';
         input3.id = 'downpaymentPercentage';
 
+        new AutoNumeric(input1, 'integerPos');
+        new AutoNumeric(input2, 'integerPos');
+
         input1.classList.add('purchase-input');
         input2.classList.add('purchase-input');
         input3.classList.add('purchase-input');
@@ -210,9 +218,6 @@ function handleTypeNewPurchase(question) {
         input1.maxLength = 15;
         input2.maxLength = 15;
         input3.maxLength = 2;
-
-        //addCommaGenEventListener(input1);
-        //addCommaGenEventListener(input2);
         
         let spacer = document.createElement('div');
 
@@ -225,10 +230,12 @@ function handleTypeNewPurchase(question) {
         paymentWrapper.appendChild(spacer);
         paymentWrapper.appendChild(span3);
         paymentWrapper.appendChild(input3);
+        paymentWrapper.appendChild(warning);
         formOptions.appendChild(paymentWrapper);
 
         handleTypeNewPurchaseInteraction();
         handleTypeNewPurchaseSaveState();
+        handleTypeNewPurchaseWarning();
     }
 }
 
@@ -236,22 +243,76 @@ function handleTypeNewPurchaseInteraction() {
     let purchasePriceInput = document.getElementById('purchasePrice');
     let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+    let newValue;
 
     purchasePriceInput.addEventListener('keyup', event => {
+        removeNaN();
         if (downpaymentAbsoluteInput.value) {
-            downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+            newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
+            //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+            downpaymentPercentageInput.value = newValue;
         }
     });
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
+        removeNaN();
         if (purchasePriceInput.value) {
-            downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+            newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
+            //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
+            downpaymentPercentageInput.value = newValue;
         }
     });
     downpaymentPercentageInput.addEventListener('keyup', event => {
+        removeNaN();
         if (purchasePriceInput.value) {
-            downpaymentAbsoluteInput.value = parseInt((downpaymentPercentageInput.value / 100) * purchasePriceInput.value);
+            newValue = parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
+            //downpaymentAbsoluteInput.value = parseInt((downpaymentPercentageInput.value / 100) * purchasePriceInput.value);
+            downpaymentAbsoluteInput.value = newValue;
         }
     });
+
+    function removeNaN() {
+        if (purchasePriceInput.value === 'NaN') {
+            purchasePriceInput.value = '';
+        }
+        
+        if (downpaymentAbsoluteInput.value === 'NaN') {
+            downpaymentAbsoluteInput.value = '';
+        }
+
+        if (downpaymentPercentageInput.value === 'NaN') {
+            downpaymentPercentageInput.value = '';
+        }
+    }    
+}
+
+
+function filterCommaNumber(commaNumber) {
+    return parseInt(commaNumber.replace(/,/g, ''))
+}
+
+function handleTypeNewPurchaseWarning() {
+    let purchasePriceInput = document.getElementById('purchasePrice');
+    let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
+    let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+    let inputs = [purchasePriceInput, downpaymentAbsoluteInput, downpaymentPercentageInput];
+
+    let warning = document.getElementById('newPurchaseWarning');
+
+    let tooLittleWarningText = 'Down payment should be greater than or equal to 3% of purchase price.';
+    let tooMuchWarningText = 'Down payment must be less than purchase price.';
+    //let invalidWarningText = 'Enter a valid value';
+
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('keyup', event => {
+            if (downpaymentPercentageInput.value < 3 && downpaymentAbsoluteInput.value) {
+                warning.innerHTML = tooLittleWarningText;
+            } else if (downpaymentPercentageInput.value > 99 && downpaymentAbsoluteInput.value) {
+                warning.innerHTML = tooMuchWarningText;
+            } else {
+                warning.innerHTML = '';
+            }
+        });
+    }
 }
 
 function handleTypeNewPurchaseSaveState() {
@@ -281,52 +342,6 @@ function addNumberFilterEventListener(input) {
     });
 }
 
-// THIS IS A WIP
-// THIS IS A WIP
-// THIS IS A WIP
-
-function addCommaGenEventListener(input) {
-    input.addEventListener('keyup', event => {
-        let n = input.value.replace(/,/g, '');
-        input.value = formatInteger(n);
-    });
-    // input.addEventListener('keydown', event => {
-    //     let n = input.value.replace(/,/g, '');
-    //     input.value = formatInteger2(n);
-    //     console.log(n);
-    // });
-}
-
-function formatInteger(n) {
-    let comma = ',';
-    n.replace(/,/g, '')
-    let a = n.split('');
-    a.reverse();
-    for (let i = 3; i < a.length; i+=4) {
-        if (a[i] !== comma) {
-            a.splice(i, 0, comma);
-        }
-    }
-    a.reverse();
-    let t = a.join('');
-    return t
-}
-
-// function formatInteger2(n) {
-//     let comma = ',';
-//     n.replace(/,/g, '')
-//     let a = n.split('');
-//     a.reverse();
-//     for (let i = 2; i < a.length; i+=4) {
-//         if (a[i] !== comma) {
-//             a.splice(i, 0, comma);
-//         }
-//     }
-//     a.reverse();
-//     let t = a.join('');
-//     return t
-// }
-
 function handleTypeTextfield(question) {
     if (question['type'] === 'textfield') {
         let label = document.createElement('label');
@@ -342,7 +357,7 @@ function handleTypeTextfield(question) {
             let span = document.createElement('span');
             span.innerHTML = '$';
             label.appendChild(span);
-            //addCommaGenEventListener(input);
+            new AutoNumeric(input, 'integerPos');
         }
 
         label.classList.add('input--wrapper');
@@ -353,8 +368,41 @@ function handleTypeTextfield(question) {
         label.appendChild(input);
         formOptions.appendChild(label);
 
+        // State management
         if (name in answers) {
             input.value = answers[name];
+        }
+    }
+}
+
+// CURRENTLY WORKING HERE
+function handleRemainingMortgageWarning(question) {
+    if (question['type'] === 'textfield' && question['name'] === 'remainingMortgageBalance') {
+        let formOptions = document.getElementById('formOptions');
+        let input = document.getElementById('currentInputField');
+        let warning = document.createElement('div');
+        let warningText = 'Looks like you may owe more than your home is worth. Please lower the amount you owe on this page, or increase your home value on the previous page.';
+        let value;
+        warning.classList.add('warning');
+        warning.id = 'remainingMortgageWarning';
+        formOptions.appendChild(warning);
+
+        displayWarning();
+
+        input.addEventListener('keyup', event => {
+            displayWarning();
+        });
+
+        function displayWarning() {
+            if ('propertyValue' in answers && input.value) {
+                value = filterCommaNumber(input.value);
+                
+                if (value > answers['propertyValue']) {
+                    warning.innerHTML = warningText;
+                } else {
+                    warning.innerHTML = '';
+                }
+            }
         }
     }
 }
@@ -522,25 +570,6 @@ function replacePurchaseField() {
     }
 }
 
-// For validating input
-
-function validate(question) {
-    isValidated = false;
-
-    // add something here sometime
-
-    return isValidated
-}
-
-function validatePropertyValue() {
-    if ('propertyValue' in answers) {
-        propertyValue = answers['propertyValue'];
-        if (propertyValue) {
-
-        }
-    }
-}
-
 // For handling next/back functionality
 
 function next() {
@@ -548,7 +577,6 @@ function next() {
     updateFields();
     getTextfieldInput();
     getNewPurchaseInput();
-    // Insert something here to validate input
 
     if (currentQuestionIndex <= questionCount) {
         currentQuestionIndex++;
@@ -563,7 +591,6 @@ function back() {
     getTextfieldInput();
     getCheckboxInput();
     getNewPurchaseInput();
-    // Insert something here to validate input
 
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
