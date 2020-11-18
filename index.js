@@ -13,6 +13,7 @@ backBtn.onclick = function() { back() };
 
 function display() {
     displayNextBack();
+    updateNextBack();
     showProgress();
     displayText();
     styleOptions();
@@ -105,6 +106,12 @@ function updateAnswers(label, value) {
 function handleTypeOptions(question) {
     let fields = question['fields'];
     if (question['type'] === 'options') {
+        if (question['name'] in answers) {
+            inputGiven = true;
+        } else {
+            inputGiven = false;
+        }
+
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let value = fields[i]['value'];
@@ -129,16 +136,10 @@ function handleTypeOptions(question) {
             // State management
             if (answers[name] === btn.value) {
                 btn.classList.add('selected');
-                inputGiven = true;
-            } else {
-                inputGiven = false;
             }
             if (typeof answers[name] === 'boolean') {
                 if (answers[name].toString() === btn.value.toString()) {
                     btn.classList.add('selected');
-                    inputGiven = true;
-                } else {
-                    inputGiven = false;
                 }
             }
 
@@ -150,6 +151,7 @@ function handleTypeOptions(question) {
                 updateAnswers(name, value);
                 btn.classList.add('selected');
                 inputGiven = true;
+                updateNextBack();
                 //next(); THIS LINE MAY CHANGE
             };
             formOptions.appendChild(btn);
@@ -160,6 +162,12 @@ function handleTypeOptions(question) {
 function handleTypeOptionsLong(question) {
     let fields = question['fields'];
     if (question['type'] === 'options-long') {
+        if (question['name'] in answers) {
+            inputGiven = true;
+        } else {
+            inputGiven = false;
+        }
+
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let subtext = fields[i]['subtext'];
@@ -178,9 +186,6 @@ function handleTypeOptionsLong(question) {
             let keys = getKeyArray();
             if (keys.includes(name) && answers[name] === btn.value) {
                 btn.classList.add('selected');
-                inputGiven = true;
-            } else  {
-                inputGiven = false;
             }
 
             // State management
@@ -192,6 +197,7 @@ function handleTypeOptionsLong(question) {
                 updateAnswers(name, value);
                 btn.classList.add('selected');
                 inputGiven = true;
+                updateNextBack();
                 //next();  THIS LINE MAY CHANGE
             };
             btn.classList.add('option-long');
@@ -321,6 +327,7 @@ function handleTypeNewPurchaseInteraction() {
     function inputGivenNewPayment() {
         if (purchasePriceInput.value && downpaymentAbsoluteInput.value && downpaymentPercentageInput.value) {
             inputGiven = true;
+            updateNextBack();
         }
     }
 }
@@ -346,12 +353,15 @@ function handleTypeNewPurchaseWarning() {
             if (downpaymentPercentageInput.value < 3 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooLittleWarningText;
                 warningPresent = true;
+                updateNextBack();
             } else if (downpaymentPercentageInput.value > 99 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooMuchWarningText;
                 warningPresent = true;
+                updateNextBack();
             } else {
                 warning.innerHTML = '';
                 warningPresent = false;
+                updateNextBack();
             }
         });
     }
@@ -385,21 +395,25 @@ function addZipFilterEventListener(input) {
 }
 
 function addZipValidationEventListener(input) {
-    input.addEventListener('keypress', event => {
+    input.addEventListener('keyup', event => {
         if (input.value.length > 4) {
             inputGiven = true;
+            updateNextBack();
         } else {
             inputGiven = false;
+            updateNextBack();
         }
     });
 }
 
-function addMoneyValidationEventListener(input) {
-    input.addEventListener('keypress', event => {
+function addInputValidationEventListener(input) {
+    input.addEventListener('keyup', event => {
         if (input.value.length > 0) {
             inputGiven = true;
+            updateNextBack();
         } else {
             inputGiven = false;
+            updateNextBack();
         }
     });
 }
@@ -420,7 +434,7 @@ function handleTypeTextfield(question) {
                 inputGiven = true;
             }
         } else if (question['fields'][0]['textType'] === 'money') {
-            addMoneyValidationEventListener(input);
+            addInputValidationEventListener(input);
             input.maxLength = 15;
             let span = document.createElement('span');
             span.innerHTML = '$';
@@ -430,6 +444,8 @@ function handleTypeTextfield(question) {
             let autoInput;
             autoInput = new AutoNumeric(input, 'integerPos');
             autoInput.options.modifyValueOnWheel(false);
+        } else {
+            addInputValidationEventListener(input);
         }
 
         label.classList.add('input--wrapper');
@@ -471,9 +487,11 @@ function handleRemainingMortgageWarning(question) {
                 if (value > answers['propertyValue']) {
                     warning.innerHTML = warningText;
                     warningPresent = true;
+                    updateNextBack();
                 } else {
                     warning.innerHTML = '';
                     warningPresent = false;
+                    updateNextBack();
                 }
             }
         }
@@ -483,6 +501,12 @@ function handleRemainingMortgageWarning(question) {
 function handleTypeCheckboxes(question) {
     let fields = question['fields'];
     if (question['type'] === 'checkboxes') {
+        if (question['name'] in answers) {
+            inputGiven = true;
+        } else {
+            inputGiven = false;
+        }
+
         let checkboxWrapper = document.createElement('div');
         checkboxWrapper.classList.add('checkbox--wrapper');
         let answerName = question['name']
@@ -501,14 +525,22 @@ function handleTypeCheckboxes(question) {
             label.appendChild(box);
             label.appendChild(display);
             checkboxWrapper.appendChild(label);
-            
+
+            label.onclick = function() {
+                let checked = document.querySelectorAll('.checkbox-field:checked');
+                if (checked.length === 0) {
+                    inputGiven = false;
+                    updateNextBack();
+                } else {
+                    inputGiven = true;
+                    updateNextBack();
+                }
+            };
+
             if (answerName in answers && answers[answerName].includes(name)) {
                 box.checked = true;
             } else if (answerName in answers && answers[answerName].length === 3) {
                 box.disabled = true;
-            }
-            if (answerName in answers) {
-                inputGiven = true;
             }
         }
         formOptions.appendChild(checkboxWrapper);
@@ -652,10 +684,11 @@ function replacePurchaseField() {
 // For handling next/back functionality
 
 function next() {
-    console.log('warning:', warningPresent);
-    console.log('input:', inputGiven);
-
     if (inputGiven && !(warningPresent)) {
+        inputGiven = false;
+        questionCount = Object.keys(formFields).length;
+
+        updateNextBack();
         handleConditionals();
         updateFields();
         getTextfieldInput();
@@ -665,11 +698,7 @@ function next() {
             currentQuestionIndex++;
             display()
         }
-        questionCount = Object.keys(formFields).length;
-        inputGiven = false;
     }
-
-    //console.log(answers);
 }
 
 function back() {
@@ -695,11 +724,16 @@ function displayNextBack() {
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
         nextBtn.onclick = function() {
-            submit();
+            if (inputGiven && !(warningPresent)) {
+                submit();
+            }
         };
 
         // Add code that makes button trigger api request
     }
+}
+
+function updateNextBack() {
     if (!(inputGiven) || warningPresent) {
         nextBtn.style.backgroundColor = 'lemonchiffon';
         nextBtn.style.color = 'black';
