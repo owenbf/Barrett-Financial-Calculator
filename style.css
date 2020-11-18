@@ -56,7 +56,7 @@ a {
 
 .form {
     width: 36rem;
-    height: 30rem;
+    height: 36rem;
     padding-bottom: 1rem;
     display: flex;
     flex-direction: column;
@@ -85,15 +85,16 @@ a {
     justify-content: center;
 }
 
-.form-options-long {
-    height: 340px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-start;
+#formOptions.form-options-long {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: .5rem;
+    transform: translateY(-6rem);
 }
 
 #formOptions > .option {
     border: 2px solid red;
+    color: red;
     background-color: inherit;
     width: 90%;
     padding: 1rem 2rem;
@@ -101,20 +102,21 @@ a {
     border-radius: .25rem;
 }
 
+#formOptions.form-options > .option:not(:last-child) {
+    margin-bottom: .5rem;
+}
+
 #formOptions > .option:hover {
     background-color: #ffbb9e;
     cursor: pointer;
 }
 
-#formOptions > .option:not(:last-child) {
-    margin-bottom: 1rem;
-}
-
 #formOptions > .option-long {
     border: 2px solid red;
+    color: red;
     background-color: inherit;
-    padding: 1rem 2rem;
-    width: 50%;
+    /*padding: 1rem 2rem;*/
+    padding: 1rem 0;
     text-align: center;
     font-size: .6rem;
     border-radius: .25rem;
@@ -124,12 +126,14 @@ a {
     background-color: #ffbb9e;
 }
 
-#formOptions > .option-long:not(:last-child) {
-    margin-bottom: .5rem;
+.option-long--text {
+    width: 100%;
+    font-size: 1.4em;
+    margin-bottom: .2rem;
 }
 
-#formOptions > .option-long:nth-child(odd) {
-    margin-right: .5rem;
+.option-long--subtext {
+    font-size: 1em;
 }
 
 .button--nav {
@@ -154,6 +158,10 @@ a {
     position: absolute;
     bottom: 1rem;
     right: 2rem;
+}
+
+#progressBar {
+    transition: width ease-in-out .25s;
 }
 
 .completion-bar--top {
@@ -190,10 +198,14 @@ a {
 }
 
 .input--wrapper {
-    border: 2px solid red;
+    border: 2px solid black;
     border-radius: .25rem;
     padding: 1rem .5rem;
     cursor: text;
+}
+
+.input--wrapper:focus-within {
+    border: 2px solid red;
 }
 
 .input {
@@ -230,6 +242,27 @@ a {
     transform: translateY(-2rem);
 }
 
+/* THIS IS A WIP */
+
+.checkbox-field {
+    visibility: hidden;
+}
+
+.checkbox-field:checked + .checkbox-display {
+    background-color: lime;
+}
+
+.checkbox-field:disabled + .checkbox-display {
+    background-color: red;
+}
+
+.checkbox-display {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: rgb(0, 17, 255);
+}
+
 .payment--wrapper {
     transform: translateY(-4rem);
     text-align: center;
@@ -242,7 +275,8 @@ a {
 }
 
 .selected {
-    background-color: lightcyan !important;
+    background-color: red !important;
+    color: white !important;
 }
 
 #remainingMortgageWarning {
@@ -254,4 +288,8 @@ a {
     font-size: .8rem;
     position: absolute;
     color: red;
+}
+
+.icon {
+    max-width: 2rem;
 }

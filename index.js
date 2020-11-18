@@ -4,7 +4,8 @@ let questionCount = Object.keys(formFields).length;
 let currentQuestion;
 let currentQuestionIndex = 0;
 let answers = {};
-// Need to find a better solution for these boolean things
+let inputGiven = false;
+let warningPresent = false;
 
 display();
 nextBtn.onclick = function() { next() };
@@ -43,9 +44,14 @@ function styleOptions() {
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
-        let currentValue = filterCommaNumber(currentInputField.value);
-        let currentName = currentInputField.name;
-        updateAnswers(currentName, currentValue);
+        let currentName = currentInputField.name
+        if (currentName !== 'county') {
+            let currentValue = filterCommaNumber(currentInputField.value);
+            updateAnswers(currentName, currentValue);    
+        } else {
+            let currentValue = currentInputField.value;
+            updateAnswers(currentName, currentValue);    
+        }
     }
 }
 
@@ -91,6 +97,7 @@ function handleFields(question) {
     handleRemainingMortgageWarning(question)
 }
 
+
 function updateAnswers(label, value) {
     answers[label] = value;
 }
@@ -103,18 +110,35 @@ function handleTypeOptions(question) {
             let value = fields[i]['value'];
             let btn = document.createElement('button');
             let name = question['name'];
-            btn.innerHTML = text;
+            let label = document.createElement('div');
+            label.innerHTML = text;
             btn.value = value;
             btn.type = 'button';
             btn.classList.add(name);
             btn.classList.add('option');
 
+            if ('icon' in fields[i]) {
+                let icon = document.createElement('img');
+                icon.src = 'icons/' + fields[i]['icon'];
+                icon.classList.add('icon');
+                btn.appendChild(icon);
+            }
+
+            btn.appendChild(label);
+
+            // State management
             if (answers[name] === btn.value) {
                 btn.classList.add('selected');
+                inputGiven = true;
+            } else {
+                inputGiven = false;
             }
             if (typeof answers[name] === 'boolean') {
                 if (answers[name].toString() === btn.value.toString()) {
                     btn.classList.add('selected');
+                    inputGiven = true;
+                } else {
+                    inputGiven = false;
                 }
             }
 
@@ -125,6 +149,7 @@ function handleTypeOptions(question) {
                 }
                 updateAnswers(name, value);
                 btn.classList.add('selected');
+                inputGiven = true;
                 //next(); THIS LINE MAY CHANGE
             };
             formOptions.appendChild(btn);
@@ -145,12 +170,17 @@ function handleTypeOptionsLong(question) {
             let btnSubtext = document.createElement('div');
             btnText.innerHTML = text;
             btnSubtext.innerHTML = subtext;
+            btnText.classList.add('option-long--text');
+            btnSubtext.classList.add('option-long--subtext');
             btn.type = 'button';
             btn.value = value;
 
             let keys = getKeyArray();
             if (keys.includes(name) && answers[name] === btn.value) {
                 btn.classList.add('selected');
+                inputGiven = true;
+            } else  {
+                inputGiven = false;
             }
 
             // State management
@@ -161,6 +191,7 @@ function handleTypeOptionsLong(question) {
                 }
                 updateAnswers(name, value);
                 btn.classList.add('selected');
+                inputGiven = true;
                 //next();  THIS LINE MAY CHANGE
             };
             btn.classList.add('option-long');
@@ -200,16 +231,16 @@ function handleTypeNewPurchase(question) {
         span2.innerHTML = '$';
         span3.innerHTML = '%';
 
-        addNumberFilterEventListener(input1);
-        addNumberFilterEventListener(input2);
-        addNumberFilterEventListener(input3);
-
         input1.id = 'purchasePrice';
         input2.id = 'downpaymentAbsolute';
         input3.id = 'downpaymentPercentage';
 
-        new AutoNumeric(input1, 'integerPos');
-        new AutoNumeric(input2, 'integerPos');
+        let autoInput1;
+        let autoInput2;
+        autoInput1 = new AutoNumeric(input1, 'integerPos');
+        autoInput2 = new AutoNumeric(input2, 'integerPos');
+        autoInput1.options.modifyValueOnWheel(false);
+        autoInput2.options.modifyValueOnWheel(false);
 
         input1.classList.add('purchase-input');
         input2.classList.add('purchase-input');
@@ -247,6 +278,7 @@ function handleTypeNewPurchaseInteraction() {
 
     purchasePriceInput.addEventListener('keyup', event => {
         removeNaN();
+        inputGivenNewPayment();
         if (downpaymentAbsoluteInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
             //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
@@ -255,6 +287,7 @@ function handleTypeNewPurchaseInteraction() {
     });
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
         removeNaN();
+        inputGivenNewPayment();
         if (purchasePriceInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
             //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
@@ -263,6 +296,7 @@ function handleTypeNewPurchaseInteraction() {
     });
     downpaymentPercentageInput.addEventListener('keyup', event => {
         removeNaN();
+        inputGivenNewPayment();
         if (purchasePriceInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
             //downpaymentAbsoluteInput.value = parseInt((downpaymentPercentageInput.value / 100) * purchasePriceInput.value);
@@ -282,9 +316,14 @@ function handleTypeNewPurchaseInteraction() {
         if (downpaymentPercentageInput.value === 'NaN') {
             downpaymentPercentageInput.value = '';
         }
-    }    
-}
+    }
 
+    function inputGivenNewPayment() {
+        if (purchasePriceInput.value && downpaymentAbsoluteInput.value && downpaymentPercentageInput.value) {
+            inputGiven = true;
+        }
+    }
+}
 
 function filterCommaNumber(commaNumber) {
     return parseInt(commaNumber.replace(/,/g, ''))
@@ -306,10 +345,13 @@ function handleTypeNewPurchaseWarning() {
         inputs[i].addEventListener('keyup', event => {
             if (downpaymentPercentageInput.value < 3 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooLittleWarningText;
+                warningPresent = true;
             } else if (downpaymentPercentageInput.value > 99 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooMuchWarningText;
+                warningPresent = true;
             } else {
                 warning.innerHTML = '';
+                warningPresent = false;
             }
         });
     }
@@ -333,11 +375,31 @@ function handleTypeNewPurchaseSaveState() {
     }
 }
 
-function addNumberFilterEventListener(input) {
+function addZipFilterEventListener(input) {
     const ZIP_ALLOWED_CHARS_REGEXP = new RegExp('^[0-9]*$');
     input.addEventListener('keypress', event => {
         if (!ZIP_ALLOWED_CHARS_REGEXP.test(event.key)) {
             event.preventDefault();
+        }
+    });
+}
+
+function addZipValidationEventListener(input) {
+    input.addEventListener('keypress', event => {
+        if (input.value.length > 4) {
+            inputGiven = true;
+        } else {
+            inputGiven = false;
+        }
+    });
+}
+
+function addMoneyValidationEventListener(input) {
+    input.addEventListener('keypress', event => {
+        if (input.value.length > 0) {
+            inputGiven = true;
+        } else {
+            inputGiven = false;
         }
     });
 }
@@ -348,34 +410,43 @@ function handleTypeTextfield(question) {
         let input = document.createElement('input');
         let name = question['name'];
 
-        addNumberFilterEventListener(input);
         if (name === 'zip') {
-            input.placeholder = '90210';
+            addZipFilterEventListener(input);
+            addZipValidationEventListener(input);
+            input.placeholder = '85233';
             input.maxLength = 5;
-        } else {
+            input.pattern = '[a-z]{1,15}';
+            if (input.value.length > 4) {
+                inputGiven = true;
+            }
+        } else if (question['fields'][0]['textType'] === 'money') {
+            addMoneyValidationEventListener(input);
             input.maxLength = 15;
             let span = document.createElement('span');
             span.innerHTML = '$';
             label.appendChild(span);
-            new AutoNumeric(input, 'integerPos');
+            input.pattern = '[a-z]{1,15}';
+
+            let autoInput;
+            autoInput = new AutoNumeric(input, 'integerPos');
+            autoInput.options.modifyValueOnWheel(false);
         }
 
         label.classList.add('input--wrapper');
         input.classList.add('input');
         input.id = 'currentInputField';
         input.name = name;
-        input.pattern = '[a-z]{1,15}';
         label.appendChild(input);
         formOptions.appendChild(label);
 
         // State management
         if (name in answers) {
             input.value = answers[name];
+            inputGiven = true;
         }
     }
 }
 
-// CURRENTLY WORKING HERE
 function handleRemainingMortgageWarning(question) {
     if (question['type'] === 'textfield' && question['name'] === 'remainingMortgageBalance') {
         let formOptions = document.getElementById('formOptions');
@@ -399,8 +470,10 @@ function handleRemainingMortgageWarning(question) {
                 
                 if (value > answers['propertyValue']) {
                     warning.innerHTML = warningText;
+                    warningPresent = true;
                 } else {
                     warning.innerHTML = '';
+                    warningPresent = false;
                 }
             }
         }
@@ -418,18 +491,24 @@ function handleTypeCheckboxes(question) {
             let name = fields[i]['name'];
             let box = document.createElement('input');
             let label = document.createElement('label');
+            let display = document.createElement('div');
             label.innerHTML = text;
             label.htmlFor = name;
             box.type = 'checkbox';
             box.id = name;
             box.classList.add('checkbox-field');
+            display.classList.add('checkbox-display');
             label.appendChild(box);
+            label.appendChild(display);
             checkboxWrapper.appendChild(label);
             
             if (answerName in answers && answers[answerName].includes(name)) {
                 box.checked = true;
             } else if (answerName in answers && answers[answerName].length === 3) {
                 box.disabled = true;
+            }
+            if (answerName in answers) {
+                inputGiven = true;
             }
         }
         formOptions.appendChild(checkboxWrapper);
@@ -573,16 +652,22 @@ function replacePurchaseField() {
 // For handling next/back functionality
 
 function next() {
-    handleConditionals();
-    updateFields();
-    getTextfieldInput();
-    getNewPurchaseInput();
+    console.log('warning:', warningPresent);
+    console.log('input:', inputGiven);
 
-    if (currentQuestionIndex <= questionCount) {
-        currentQuestionIndex++;
-        display()
+    if (inputGiven && !(warningPresent)) {
+        handleConditionals();
+        updateFields();
+        getTextfieldInput();
+        getNewPurchaseInput();
+
+        if (currentQuestionIndex <= questionCount) {
+            currentQuestionIndex++;
+            display()
+        }
+        questionCount = Object.keys(formFields).length;
+        inputGiven = false;
     }
-    questionCount = Object.keys(formFields).length;
 
     //console.log(answers);
 }
@@ -615,6 +700,13 @@ function displayNextBack() {
 
         // Add code that makes button trigger api request
     }
+    if (!(inputGiven) || warningPresent) {
+        nextBtn.style.backgroundColor = 'lemonchiffon';
+        nextBtn.style.color = 'black';
+    } else {
+        nextBtn.style.backgroundColor = 'red';
+        nextBtn.style.color = 'white';
+    }
 }
 
 function submit() {
@@ -637,7 +729,7 @@ function showProgress() {
 }
 
 function incrementOnKeypress(event) {
-    if (event.which === 13) { // checks for enter/return keypress
+    if (event.which === 13) { // Enter/return was pressed
         if (currentQuestionIndex+1 >= questionCount) {
             submit();
         } else {

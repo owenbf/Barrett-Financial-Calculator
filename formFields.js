@@ -6,12 +6,12 @@ export let formFields = [
         "fields": [
             {
                 "text": "Refinance",
-                "icon": "house.jpg",
+                "icon": "mortgage.svg",
                 "value": "refinance"
             },
             {
                 "text": "Purchase",
-                "icon": "test.png",
+                "icon": "home.svg",
                 "value": "purchase"
             }
         ]
@@ -23,17 +23,17 @@ export let formFields = [
         "fields": [
             {
                 "text": "Primary Residence",
-                "icon": "house.jpg",
+                "icon": "home.svg",
                 "value": "primaryResidence"
             },
             {
                 "text": "Second Home",
-                "icon": "house.jpg",
+                "icon": "houses.svg",
                 "value": "secondHome"
             },
             {
                 "text": "Investment",
-                "icon": "house.jpg",
+                "icon": "value.svg",
                 "value": "investment"
             }
         ]
@@ -45,22 +45,22 @@ export let formFields = [
         "fields": [
             {
                 "text": "Single Family",
-                "icon": "house.jpg",
+                "icon": "home.svg",
                 "value": "singleFamily"
             },
             {
                 "text": "Townhouse",
-                "icon": "house.jpg",
+                "icon": "townhouse.svg",
                 "value": "townhouse"
             },
             {
                 "text": "2-4 Unit Duplex",
-                "icon": "house.jpg",
+                "icon": "duplex.svg",
                 "value": "duplex"
             },
             {
                 "text": "Condominium",
-                "icon": "house.jpg",
+                "icon": "condominium.svg",
                 "value": "condominium"
             }
         ]
@@ -81,6 +81,39 @@ export let formFields = [
         ]
     },
     {
+        "text": "Select from states we serve...",
+        "type": "options",
+        "name": "state",
+        "fields": [
+            {
+                "text": "Iowa",
+                "value": "iowa"
+            },
+            {
+                "text": "Arkansas",
+                "value": "arkansas"
+            },
+            {
+                "text": "Texas",
+                "value": "texas"
+            },
+            {
+                "text": "Louisiana",
+                "value": "louisiana"
+            }
+        ]
+    },
+    {
+        "text": "The county is...",
+        "type": "textfield",
+        "name": "county",
+        "fields": [
+            {
+                "textType": "text"
+            }
+        ]
+    },
+    {
         "text": "The zip code is...",
         "type": "textfield",
         "name": "zip",
@@ -90,7 +123,6 @@ export let formFields = [
             }
         ]
     },
-    
     {
         "text": "What is your estimated credit score?",
         "type": "options-long",
