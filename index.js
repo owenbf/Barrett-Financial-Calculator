@@ -1,3 +1,4 @@
+'use strict';
 import { formFields, purchasePaymentField, refinancePaymentField, refinanceQuestions, militaryFields } from './formFields.js'
 
 let questionCount = Object.keys(formFields).length;
@@ -42,6 +43,12 @@ function styleOptions() {
     }
 }
 
+function getInput() {
+    getTextfieldInput();
+    getNewPurchaseInput();
+    getCheckboxInput();
+}
+
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
@@ -69,8 +76,8 @@ function getNewPurchaseInput() {
 }
 
 function getCheckboxInput() {
-    if (document.querySelector('.checkbox-field:checked')) {
-        let checkedValues = document.querySelectorAll('.checkbox-field:checked');
+    if (document.querySelector('.checkbox:checked')) {
+        let checkedValues = document.querySelectorAll('.checkbox:checked');
         let name = 'loanTerms';
         let loanTerms = [];
         for (let item of checkedValues) {
@@ -98,20 +105,36 @@ function handleFields(question) {
     handleRemainingMortgageWarning(question)
 }
 
-
 function updateAnswers(label, value) {
     answers[label] = value;
+}
+
+function allowNextForOptions(question) {
+    if (question['name'] in answers) {
+        inputGiven = true;
+    } else {
+        inputGiven = false;
+    }
+}
+
+function addOptionsEventListener(btn, name, value) {
+    btn.onclick = function() {
+        let buttons = document.querySelectorAll('#formOptions > button');
+        for (let button of buttons) {
+            button.classList.remove('selected');
+        }
+        updateAnswers(name, value);
+        btn.classList.add('selected');
+        inputGiven = true;
+        updateNextBack();
+    };
 }
 
 function handleTypeOptions(question) {
     let fields = question['fields'];
     if (question['type'] === 'options') {
-        if (question['name'] in answers) {
-            inputGiven = true;
-        } else {
-            inputGiven = false;
-        }
-
+        allowNextForOptions(question);
+        
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let value = fields[i]['value'];
@@ -130,30 +153,19 @@ function handleTypeOptions(question) {
                 icon.classList.add('icon');
                 btn.appendChild(icon);
             }
-
             btn.appendChild(label);
 
-            // State management
             if (answers[name] === btn.value) {
                 btn.classList.add('selected');
             }
+
             if (typeof answers[name] === 'boolean') {
                 if (answers[name].toString() === btn.value.toString()) {
                     btn.classList.add('selected');
                 }
             }
 
-            btn.onclick = function() {
-                let buttons = document.getElementsByClassName('option');
-                for (let button of buttons) {
-                    button.classList.remove('selected');
-                }
-                updateAnswers(name, value);
-                btn.classList.add('selected');
-                inputGiven = true;
-                updateNextBack();
-                //next(); THIS LINE MAY CHANGE
-            };
+            addOptionsEventListener(btn, name, value);
             formOptions.appendChild(btn);
         }
     }
@@ -162,47 +174,35 @@ function handleTypeOptions(question) {
 function handleTypeOptionsLong(question) {
     let fields = question['fields'];
     if (question['type'] === 'options-long') {
-        if (question['name'] in answers) {
-            inputGiven = true;
-        } else {
-            inputGiven = false;
-        }
+        allowNextForOptions(question);
 
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
-            let subtext = fields[i]['subtext'];
             let value = fields[i]['value'];
             let name = question['name'];
             let btn = document.createElement('button');
             let btnText = document.createElement('div');
-            let btnSubtext = document.createElement('div');
             btnText.innerHTML = text;
-            btnSubtext.innerHTML = subtext;
-            btnText.classList.add('option-long--text');
-            btnSubtext.classList.add('option-long--subtext');
+            btnText.classList.add('option-long-text');
             btn.type = 'button';
             btn.value = value;
+            btn.classList.add('option-long');
+            btn.appendChild(btnText);
+
+            if (fields[i]['subtext']) {
+                let subtext = fields[i]['subtext'];
+                let btnSubtext = document.createElement('div');
+                btnSubtext.innerHTML = subtext;
+                btnSubtext.classList.add('option-long-subtext');
+                btn.appendChild(btnSubtext);
+            }
 
             let keys = getKeyArray();
             if (keys.includes(name) && answers[name] === btn.value) {
                 btn.classList.add('selected');
             }
 
-            // State management
-            btn.onclick = function () {
-                let buttons = document.getElementsByClassName('option-long');
-                for (let button of buttons) {
-                    button.classList.remove('selected');
-                }
-                updateAnswers(name, value);
-                btn.classList.add('selected');
-                inputGiven = true;
-                updateNextBack();
-                //next();  THIS LINE MAY CHANGE
-            };
-            btn.classList.add('option-long');
-            btn.appendChild(btnText);
-            btn.appendChild(btnSubtext);
+            addOptionsEventListener(btn, name, value);
             formOptions.appendChild(btn);
         }
     }
@@ -211,7 +211,7 @@ function handleTypeOptionsLong(question) {
 function handleTypeNewPurchase(question) {
     if (question['type'] === 'newPurchase') {
         let paymentWrapper = document.createElement('div');
-        paymentWrapper.classList.add('payment--wrapper');
+        paymentWrapper.classList.add('payment-wrapper');
 
         let text1 = question['text1'];
         let text2 = question['text2'];
@@ -310,6 +310,7 @@ function handleTypeNewPurchaseInteraction() {
         }
     });
 
+    // This doesn't effectively do what it's supposed to
     function removeNaN() {
         if (purchasePriceInput.value === 'NaN') {
             purchasePriceInput.value = '';
@@ -446,9 +447,11 @@ function handleTypeTextfield(question) {
             autoInput.options.modifyValueOnWheel(false);
         } else {
             addInputValidationEventListener(input);
+            addTitleCaseEventListener(input);
+            input.placeholder = 'Dallas';
         }
 
-        label.classList.add('input--wrapper');
+        label.classList.add('input-wrapper');
         input.classList.add('input');
         input.id = 'currentInputField';
         input.name = name;
@@ -461,6 +464,17 @@ function handleTypeTextfield(question) {
             inputGiven = true;
         }
     }
+}
+
+function addTitleCaseEventListener(input) {
+    input.addEventListener('keyup', event => {
+        input.value = toTitleCase(input.value);
+    });
+}
+
+function toTitleCase(str) 
+{
+   return str.split(/\s+/).map(s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 }
 
 function handleRemainingMortgageWarning(question) {
@@ -483,7 +497,7 @@ function handleRemainingMortgageWarning(question) {
         function displayWarning() {
             if ('propertyValue' in answers && input.value) {
                 value = filterCommaNumber(input.value);
-                
+
                 if (value > answers['propertyValue']) {
                     warning.innerHTML = warningText;
                     warningPresent = true;
@@ -501,33 +515,40 @@ function handleRemainingMortgageWarning(question) {
 function handleTypeCheckboxes(question) {
     let fields = question['fields'];
     if (question['type'] === 'checkboxes') {
-        if (question['name'] in answers) {
-            inputGiven = true;
-        } else {
-            inputGiven = false;
-        }
+        allowNextForOptions(question);
 
-        let checkboxWrapper = document.createElement('div');
-        checkboxWrapper.classList.add('checkbox--wrapper');
+        let checkboxContainer = document.createElement('div');
+        checkboxContainer.classList.add('checkboxes-container');
         let answerName = question['name']
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let name = fields[i]['name'];
-            let box = document.createElement('input');
+
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = name;
+            checkbox.classList.add('checkbox');
+
+            let innerLabel = document.createElement('span');
+            innerLabel.innerHTML = text;
+
+            let displayCheckbox = document.createElement('span');
+            displayCheckbox.classList.add('checkbox-display');
+
             let label = document.createElement('label');
-            let display = document.createElement('div');
-            label.innerHTML = text;
             label.htmlFor = name;
-            box.type = 'checkbox';
-            box.id = name;
-            box.classList.add('checkbox-field');
-            display.classList.add('checkbox-display');
-            label.appendChild(box);
-            label.appendChild(display);
+            label.appendChild(innerLabel);
+            label.appendChild(displayCheckbox);
+
+            let checkboxWrapper = document.createElement('div');
+            checkboxWrapper.classList.add('checkbox-wrapper');
+            checkboxWrapper.appendChild(checkbox);
             checkboxWrapper.appendChild(label);
 
+            checkboxContainer.appendChild(checkboxWrapper);
+
             label.onclick = function() {
-                let checked = document.querySelectorAll('.checkbox-field:checked');
+                let checked = document.querySelectorAll('.checkbox:checked');
                 if (checked.length === 0) {
                     inputGiven = false;
                     updateNextBack();
@@ -538,18 +559,18 @@ function handleTypeCheckboxes(question) {
             };
 
             if (answerName in answers && answers[answerName].includes(name)) {
-                box.checked = true;
+                checkbox.checked = true;
             } else if (answerName in answers && answers[answerName].length === 3) {
-                box.disabled = true;
+                checkbox.disabled = true;
             }
         }
-        formOptions.appendChild(checkboxWrapper);
+        formOptions.appendChild(checkboxContainer);
         limitCheckboxCount(3);
     }
 }
 
 function limitCheckboxCount(limit) {
-    let checkboxes = document.getElementsByClassName('checkbox-field');         
+    let checkboxes = document.getElementsByClassName('checkbox');         
     for (let i = 0; i < checkboxes.length; i++) {
         checkboxes[i].onclick = function() {
             let checkedcount = 0;
@@ -579,6 +600,7 @@ function handleConditionals() {
     handleVALoanCase();
 }
 
+// Could improve naming here
 function getKeyArray() {
     let array = [];
     for (let item of formFields) {
@@ -640,7 +662,7 @@ function handleVALoanCase() {
     }
 }
 
-// For removing things when they get changed
+// For removing questions when conditionals get updated
 
 function updateFields() {
     replaceRefinanceFields();
@@ -674,7 +696,7 @@ function replacePurchaseField() {
                 formFields.splice(indexOfMortgageBalanceField+i, 0, refinanceQuestions[i]);
             }    
         }
-        
+
         if (refinanceQuestions.includes(refinancePaymentField)) {
             refinanceQuestions.splice(0, 1);
         }
@@ -691,20 +713,19 @@ function next() {
         updateNextBack();
         handleConditionals();
         updateFields();
-        getTextfieldInput();
-        getNewPurchaseInput();
+        getInput();
 
         if (currentQuestionIndex <= questionCount) {
             currentQuestionIndex++;
-            display()
+            display();
         }
+
+        console.log(answers);
     }
 }
 
 function back() {
-    getTextfieldInput();
-    getCheckboxInput();
-    getNewPurchaseInput();
+    getInput();
 
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
@@ -738,13 +759,13 @@ function updateNextBack() {
         nextBtn.style.backgroundColor = 'lemonchiffon';
         nextBtn.style.color = 'black';
     } else {
-        nextBtn.style.backgroundColor = 'red';
+        nextBtn.style.backgroundColor = '#0e508b';
         nextBtn.style.color = 'white';
     }
 }
 
 function submit() {
-    getCheckboxInput();
+    getInput();
     present();
 }
 
@@ -772,4 +793,4 @@ function incrementOnKeypress(event) {
     }
 }
 
-document.addEventListener("keypress", incrementOnKeypress);
+document.addEventListener("keydown", incrementOnKeypress);

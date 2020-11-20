@@ -82,24 +82,48 @@ export let formFields = [
     },
     {
         "text": "Select from states we serve...",
-        "type": "options",
+        "type": "options-long",
         "name": "state",
         "fields": [
             {
-                "text": "Iowa",
-                "value": "iowa"
+                "text": "Arizona",
+                "value": "arizona"
             },
             {
-                "text": "Arkansas",
-                "value": "arkansas"
+                "text": "California",
+                "value": "california"
+            },
+            {
+                "text": "Colorado",
+                "value": "colorado"
+            },
+            {
+                "text": "Washington",
+                "value": "washington"
+            },
+            {
+                "text": "Utah",
+                "value": "utah"
             },
             {
                 "text": "Texas",
                 "value": "texas"
             },
             {
-                "text": "Louisiana",
-                "value": "louisiana"
+                "text": "Nevada",
+                "value": "nevada"
+            },
+            {
+                "text": "Florida",
+                "value": "florida"
+            },
+            {
+                "text": "Oregon",
+                "value": "oregon"
+            },
+            {
+                "text": "Michigan",
+                "value": "michigan"
             }
         ]
     },
