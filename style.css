@@ -358,6 +358,10 @@ a {
     text-align: center;
 }
 
+#textfieldWarning {
+    transform: translateY(4rem);
+}
+
 .warning {
     font-size: .8rem;
     position: absolute;
