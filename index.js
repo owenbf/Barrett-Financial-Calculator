@@ -210,9 +210,7 @@ function handleTypeNewPurchase(question) {
         let paymentWrapper = document.createElement('div');
         paymentWrapper.classList.add('payment-wrapper');
 
-        let text1 = question['text1'];
-        let text2 = question['text2'];
-
+        let [text1, text2] = [question['text1'], question['text2']];
         let label1 = document.createElement('h3');
         let label2 = document.createElement('h3');
         label1.innerHTML = text1;
@@ -221,56 +219,53 @@ function handleTypeNewPurchase(question) {
         let input1 = document.createElement('input');
         let input2 = document.createElement('input');
         let input3 = document.createElement('input');
+        configureTypeNewPurchaseInputs(input1, input2, input3);
 
         let span1 = document.createElement('span');
         let span2 = document.createElement('span');
         let span3 = document.createElement('span');
 
+        let spacer = document.createElement('div');
         let warning = document.createElement('div');
         warning.id = 'newPurchaseWarning';
         warning.classList.add('warning');
 
-        span1.innerHTML = '$';
-        span2.innerHTML = '$';
+        span1.innerHTML, span2.innerHTML = '$';
         span3.innerHTML = '%';
 
-        input1.id = 'purchasePrice';
-        input2.id = 'downpaymentAbsolute';
-        input3.id = 'downpaymentPercentage';
-
-        let autoInput1;
-        let autoInput2;
-        autoInput1 = new AutoNumeric(input1, 'integerPos');
-        autoInput2 = new AutoNumeric(input2, 'integerPos');
-        autoInput1.options.modifyValueOnWheel(false);
-        autoInput2.options.modifyValueOnWheel(false);
-
-        input1.classList.add('purchase-input');
-        input2.classList.add('purchase-input');
-        input3.classList.add('purchase-input');
-
-        input1.maxLength = 15;
-        input2.maxLength = 15;
-        input3.maxLength = 2;
-        
-        let spacer = document.createElement('div');
-
-        paymentWrapper.appendChild(label1);
-        paymentWrapper.appendChild(span1);
-        paymentWrapper.appendChild(input1);
-        paymentWrapper.appendChild(label2);
-        paymentWrapper.appendChild(span2);
-        paymentWrapper.appendChild(input2);
-        paymentWrapper.appendChild(spacer);
-        paymentWrapper.appendChild(span3);
-        paymentWrapper.appendChild(input3);
-        paymentWrapper.appendChild(warning);
+        let elements = [label1, span1, input1, label2, span2, input2, spacer, span3, input3, warning];
+        elements.forEach(e => paymentWrapper.appendChild(e));
         formOptions.appendChild(paymentWrapper);
 
-        handleTypeNewPurchaseInteraction();
-        handleTypeNewPurchaseSaveState();
-        handleTypeNewPurchaseWarning();
+        handleTypeNewPurchaseFunctionality();
     }
+}
+
+
+
+function configureTypeNewPurchaseInputs(input1, input2, input3) {
+    input1.id = 'purchasePrice';
+    input2.id = 'downpaymentAbsolute';
+    input3.id = 'downpaymentPercentage';
+
+    [input1, input2, input3].forEach(e => e.classList.add('purchase-input'));
+
+    input1.maxLength = 15;
+    input2.maxLength = 15;
+    input3.maxLength = 2;
+
+    let autoInput1;
+    let autoInput2;
+    autoInput1 = new AutoNumeric(input1, 'integerPos');
+    autoInput2 = new AutoNumeric(input2, 'integerPos');
+    autoInput1.options.modifyValueOnWheel(false);
+    autoInput2.options.modifyValueOnWheel(false);
+}
+
+function handleTypeNewPurchaseFunctionality() {
+    handleTypeNewPurchaseInteraction();
+    handleTypeNewPurchaseSaveState();
+    handleTypeNewPurchaseWarning();
 }
 
 function handleTypeNewPurchaseInteraction() {
@@ -502,35 +497,14 @@ function handleTypeTextfield(question) {
         warning.innerHTML = '';
 
         if (name === 'zip') {
-            addZipFilterEventListener(input);
-            addZipValidationEventListener(input);
-            addZipWarningEventListener(input);
-            input.placeholder = '85233';
-            input.maxLength = 5;
-            input.pattern = '[a-z]{1,15}';
+            handleTypeZip(input);
         } else if (question['fields'][0]['textType'] === 'money') {
-            addMoneyValidationEventListener(input);
-            input.maxLength = 15;
-            let span = document.createElement('span');
-            span.innerHTML = '$';
-            label.appendChild(span);
-            input.pattern = '[a-z]{1,15}';
-
-            let autoInput;
-            autoInput = new AutoNumeric(input, 'integerPos');
-            autoInput.options.modifyValueOnWheel(false);
+            handleTypeMoney(input, label);
         } else {
-            addCountyValidationEventListener(input);
-            addCountyWarningEventListener(input);
-            addTitleCaseEventListener(input);
-            input.placeholder = 'Maricopa';
+            handleTypeCounty(input);
         }
 
-        label.classList.add('input-wrapper');
-        input.classList.add('input');
-        input.id = 'currentInputField';
-        input.name = name;
-        label.appendChild(input);
+        buildTypeTextfieldDisplay(input, label);
         formOptions.appendChild(label);
         formOptions.appendChild(warning);
 
@@ -540,6 +514,43 @@ function handleTypeTextfield(question) {
             inputGiven = true;
         }
     }
+}
+
+function buildTypeTextfieldDisplay(input, label) {
+    label.classList.add('input-wrapper');
+    input.classList.add('input');
+    input.id = 'currentInputField';
+    input.name = name;
+    label.appendChild(input);
+}
+
+function handleTypeZip(input) {
+    addZipFilterEventListener(input);
+    addZipValidationEventListener(input);
+    addZipWarningEventListener(input);
+    input.placeholder = '85233';
+    input.maxLength = 5;
+    input.pattern = '[a-z]{1,15}';
+}
+
+function handleTypeMoney(input, label) {
+    addMoneyValidationEventListener(input);
+    input.maxLength = 15;
+    let span = document.createElement('span');
+    span.innerHTML = '$';
+    label.appendChild(span);
+    input.pattern = '[a-z]{1,15}';
+
+    let autoInput;
+    autoInput = new AutoNumeric(input, 'integerPos');
+    autoInput.options.modifyValueOnWheel(false);
+}
+
+function handleTypeCounty(input) {
+    addCountyValidationEventListener(input);
+    addCountyWarningEventListener(input);
+    addTitleCaseEventListener(input);
+    input.placeholder = 'Maricopa';
 }
 
 function addCountyValidationEventListener(input) {
@@ -702,14 +713,6 @@ function handleConditionals() {
     handleMilitaryCase();
     handleVALoanCase();
 }
-
-// function getFormFieldKeyArray() {
-//     let array = [];
-//     for (let item of formFields) {
-//         array.push(item['name']);
-//     }
-//     return array
-// }
 
 function getFormFieldKeyArray() {
     return formFields.map(x => x['name']);
