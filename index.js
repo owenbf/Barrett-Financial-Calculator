@@ -277,27 +277,23 @@ function handleTypeNewPurchaseInteraction() {
     let purchasePriceInput = document.getElementById('purchasePrice');
     let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
-    let newValue;
 
     purchasePriceInput.addEventListener('keyup', event => {
         inputGivenNewPayment();
         if (downpaymentAbsoluteInput.value) {
-            newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
-            downpaymentPercentageInput.value = newValue;
+            downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
         inputGivenNewPayment();
         if (purchasePriceInput.value) {
-            newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
-            downpaymentPercentageInput.value = newValue;
+            downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
     downpaymentPercentageInput.addEventListener('keyup', event => {
         inputGivenNewPayment();
         if (purchasePriceInput.value) {
-            newValue = parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
-            downpaymentAbsoluteInput.value = newValue;
+            downpaymentAbsoluteInput.value = getNewDownpaymentAbsoluteInputValue();
         }
     });
 
@@ -307,10 +303,21 @@ function handleTypeNewPurchaseInteraction() {
             updateNextBack();
         }
     }
+
+    function getNewDownpaymentPercentageInputValue() {
+        let newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
+        return (newValue === NaN ? 0 : newValue);
+    }
+
+    function getNewDownpaymentAbsoluteInputValue() {
+        let newValue =  parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
+        return (newValue === NaN ? 0 : newValue);
+    }
 }
 
 function filterCommaNumber(n) {
-    return parseInt(n.replace(/,/g, ''));
+    let p = parseInt(n.replace(/,/g, ''))
+    return (p === NaN ? 0 : p);
 }
 
 function handleTypeNewPurchaseWarning() {
@@ -819,7 +826,7 @@ function next() {
             display();
         }
 
-        console.log(answers);
+        //console.log(answers);
     }
 }
 
