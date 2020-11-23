@@ -50,10 +50,15 @@ function getInput() {
     getCheckboxInput();
 }
 
+function filterCommaNumber(n) {
+    let p = parseInt(n.replace(/,/g, ''))
+    return (p === NaN ? 0 : p);
+}
+
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
-        let currentName = currentInputField.name
+        let currentName = currentInputField.name;
         if (currentName !== 'county') {
             let currentValue = filterCommaNumber(currentInputField.value);
             updateAnswers(currentName, currentValue);    
@@ -94,8 +99,7 @@ function displayFields() {
     handleFields(currentQuestion);
 }
 
-// For handling various question types
-// and updating answers dictionary
+// For handling various question types and updating answers dictionary
 
 function handleFields(question) {
     handleTypeOptions(question);
@@ -139,10 +143,7 @@ function handleTypeOptions(question) {
             let name = question['name'];
             let label = document.createElement('div');
             label.innerHTML = text;
-            btn.value = value;
-            btn.type = 'button';
-            btn.classList.add(name);
-            btn.classList.add('option');
+            buildTypeOptionsButton(btn, name, value);
 
             if ('icon' in fields[i]) {
                 let icon = document.createElement('img');
@@ -166,6 +167,13 @@ function handleTypeOptions(question) {
             formOptions.appendChild(btn);
         }
     }
+}
+
+function buildTypeOptionsButton(btn, name, value) {
+    btn.value = value;
+    btn.type = 'button';
+    btn.classList.add(name);
+    btn.classList.add('option');
 }
 
 function handleTypeOptionsLong(question) {
@@ -241,8 +249,6 @@ function handleTypeNewPurchase(question) {
     }
 }
 
-
-
 function configureTypeNewPurchaseInputs(input1, input2, input3) {
     input1.id = 'purchasePrice';
     input2.id = 'downpaymentAbsolute';
@@ -308,11 +314,6 @@ function handleTypeNewPurchaseInteraction() {
         let newValue =  parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
         return (newValue === NaN ? 0 : newValue);
     }
-}
-
-function filterCommaNumber(n) {
-    let p = parseInt(n.replace(/,/g, ''))
-    return (p === NaN ? 0 : p);
 }
 
 function handleTypeNewPurchaseWarning() {
@@ -504,7 +505,7 @@ function handleTypeTextfield(question) {
             handleTypeCounty(input);
         }
 
-        buildTypeTextfieldDisplay(input, label);
+        buildTypeTextfieldDisplay(input, label, name);
         formOptions.appendChild(label);
         formOptions.appendChild(warning);
 
@@ -516,7 +517,8 @@ function handleTypeTextfield(question) {
     }
 }
 
-function buildTypeTextfieldDisplay(input, label) {
+// These might screw up state management
+function buildTypeTextfieldDisplay(input, label, name) {
     label.classList.add('input-wrapper');
     input.classList.add('input');
     input.id = 'currentInputField';
@@ -603,10 +605,7 @@ function handleRemainingMortgageWarning(question) {
         formOptions.appendChild(warning);
 
         displayWarning();
-
-        input.addEventListener('keyup', event => {
-            displayWarning();
-        });
+        input.addEventListener('keyup', event => { displayWarning(); });
 
         function displayWarning() {
             if ('propertyValue' in answers && input.value) {
@@ -829,7 +828,7 @@ function next() {
             display();
         }
 
-        //console.log(answers);
+        console.log(answers);
     }
 }
 
