@@ -106,16 +106,12 @@ function handleFields(question) {
     handleRemainingMortgageWarning(question)
 }
 
-function updateAnswers(label, value) {
-    answers[label] = value;
+function updateAnswers(l, v) {
+    answers[l] = v;
 }
 
-function allowNextForOptions(question) {
-    if (question['name'] in answers) {
-        inputGiven = true;
-    } else {
-        inputGiven = false;
-    }
+function allowNextTypeOptions(q) {
+    return q['name'] in answers ? inputGiven = true : inputGiven = false;
 }
 
 function addOptionsEventListener(btn, name, value) {
@@ -134,7 +130,7 @@ function addOptionsEventListener(btn, name, value) {
 function handleTypeOptions(question) {
     let fields = question['fields'];
     if (question['type'] === 'options') {
-        allowNextForOptions(question);
+        allowNextTypeOptions(question);
         
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
@@ -175,7 +171,7 @@ function handleTypeOptions(question) {
 function handleTypeOptionsLong(question) {
     let fields = question['fields'];
     if (question['type'] === 'options-long') {
-        allowNextForOptions(question);
+        allowNextTypeOptions(question);
 
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
@@ -198,7 +194,7 @@ function handleTypeOptionsLong(question) {
                 btn.appendChild(btnSubtext);
             }
 
-            let keys = getKeyArray();
+            let keys = getFormFieldKeyArray();
             if (keys.includes(name) && answers[name] === btn.value) {
                 btn.classList.add('selected');
             }
@@ -284,47 +280,26 @@ function handleTypeNewPurchaseInteraction() {
     let newValue;
 
     purchasePriceInput.addEventListener('keyup', event => {
-        removeNaN();
         inputGivenNewPayment();
         if (downpaymentAbsoluteInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
-            //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
             downpaymentPercentageInput.value = newValue;
         }
     });
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
-        removeNaN();
         inputGivenNewPayment();
         if (purchasePriceInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
-            //downpaymentPercentageInput.value = parseInt((downpaymentAbsoluteInput.value / purchasePriceInput.value) * 100);
             downpaymentPercentageInput.value = newValue;
         }
     });
     downpaymentPercentageInput.addEventListener('keyup', event => {
-        removeNaN();
         inputGivenNewPayment();
         if (purchasePriceInput.value) {
             newValue = parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
-            //downpaymentAbsoluteInput.value = parseInt((downpaymentPercentageInput.value / 100) * purchasePriceInput.value);
             downpaymentAbsoluteInput.value = newValue;
         }
     });
-
-    // This doesn't effectively do what it's supposed to
-    function removeNaN() {
-        if (purchasePriceInput.value === 'NaN') {
-            purchasePriceInput.value = '';
-        }
-        
-        if (downpaymentAbsoluteInput.value === 'NaN') {
-            downpaymentAbsoluteInput.value = '';
-        }
-
-        if (downpaymentPercentageInput.value === 'NaN') {
-            downpaymentPercentageInput.value = '';
-        }
-    }
 
     function inputGivenNewPayment() {
         if (purchasePriceInput.value && downpaymentAbsoluteInput.value && downpaymentPercentageInput.value) {
@@ -334,8 +309,8 @@ function handleTypeNewPurchaseInteraction() {
     }
 }
 
-function filterCommaNumber(commaNumber) {
-    return parseInt(commaNumber.replace(/,/g, ''))
+function filterCommaNumber(n) {
+    return parseInt(n.replace(/,/g, ''));
 }
 
 function handleTypeNewPurchaseWarning() {
@@ -348,7 +323,6 @@ function handleTypeNewPurchaseWarning() {
 
     let tooLittleWarningText = 'Down payment should be greater than or equal to 3% of purchase price.';
     let tooMuchWarningText = 'Down payment must be less than purchase price.';
-    //let invalidWarningText = 'Enter a valid value';
 
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].addEventListener('keyup', event => {
@@ -527,9 +501,6 @@ function handleTypeTextfield(question) {
             input.placeholder = '85233';
             input.maxLength = 5;
             input.pattern = '[a-z]{1,15}';
-            if (input.value.length > 4) {
-                inputGiven = true;
-            }
         } else if (question['fields'][0]['textType'] === 'money') {
             addMoneyValidationEventListener(input);
             input.maxLength = 15;
@@ -567,7 +538,7 @@ function handleTypeTextfield(question) {
 function addCountyValidationEventListener(input) {
     input.addEventListener('keyup', event => {
         let state = answers['state'];
-        
+
         if (!(counties[state].includes(input.value))) {
             inputGiven = false;
             warningPresent = true;
@@ -598,8 +569,7 @@ function addTitleCaseEventListener(input) {
     });
 }
 
-function toTitleCase(str) 
-{
+function toTitleCase(str) {
    return str.split(/\s+/).map(s => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
 }
 
@@ -641,7 +611,7 @@ function handleRemainingMortgageWarning(question) {
 function handleTypeCheckboxes(question) {
     let fields = question['fields'];
     if (question['type'] === 'checkboxes') {
-        allowNextForOptions(question);
+        allowNextTypeOptions(question);
 
         let checkboxContainer = document.createElement('div');
         checkboxContainer.classList.add('checkboxes-container');
@@ -726,17 +696,20 @@ function handleConditionals() {
     handleVALoanCase();
 }
 
-// Could improve naming here
-function getKeyArray() {
-    let array = [];
-    for (let item of formFields) {
-        array.push(item['name']);
-    }
-    return array
+// function getFormFieldKeyArray() {
+//     let array = [];
+//     for (let item of formFields) {
+//         array.push(item['name']);
+//     }
+//     return array
+// }
+
+function getFormFieldKeyArray() {
+    return formFields.map(x => x['name']);
 }
 
 function handlePurchaseCase() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let indexOfCreditScore = keys.indexOf('creditScore');
     let mortgageQuestionExists = keys.includes('remainingMortgageBalance');
 
@@ -752,7 +725,7 @@ function handlePurchaseCase() {
 }
 
 function handleMilitaryCase() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let indexOfMilitary = keys.indexOf('isMilitary');
     let militaryQuestionsExist = keys.includes('isVALoan') || keys.includes('isVAFirstTime') || keys.includes('isVAFundingFeeExempt');
     if (answers['isMilitary'] && !(militaryQuestionsExist)) {
@@ -762,7 +735,7 @@ function handleMilitaryCase() {
 }
 
 function reverseMilitaryCase() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let indexOfMilitary = keys.indexOf('isMilitary');
     let militaryQuestionsExist = keys.includes('isVALoan') || keys.includes('isVAFirstTime') || keys.includes('isVAFundingFeeExempt');
     if (!(answers['isMilitary']) && militaryQuestionsExist) {
@@ -773,7 +746,7 @@ function reverseMilitaryCase() {
 }
 
 function handleVALoanCase() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let indexOfisVALoan = keys.indexOf('isVALoan');
     let firstTimeExists = keys.includes('isVAFirstTime');
     let isVALoanInAnswers = 'isVALoan' in answers;
@@ -797,7 +770,7 @@ function updateFields() {
 }
 
 function replaceRefinanceFields() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let values = Object.values(answers);
     if (keys.includes('propertyValue') && values.includes('purchase')) {
         let indexOfPropertyValueField = keys.indexOf('propertyValue');
@@ -806,7 +779,7 @@ function replaceRefinanceFields() {
 }
 
 function replacePurchaseField() {
-    let keys = getKeyArray();
+    let keys = getFormFieldKeyArray();
     let values = Object.values(answers);
 
     if (keys.includes('remainingMortgageBalance') && values.includes('refinance')) {
