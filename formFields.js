@@ -14,7 +14,8 @@ export let formFields = [
                 "icon": "home.svg",
                 "value": "purchase"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "This will be my...",
@@ -36,7 +37,8 @@ export let formFields = [
                 "icon": "value.svg",
                 "value": "investment"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "This property is a...",
@@ -63,7 +65,8 @@ export let formFields = [
                 "icon": "condominium.svg",
                 "value": "condominium"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Have you or your spouse ever served in the military?",
@@ -78,7 +81,8 @@ export let formFields = [
                 "text": "No",
                 "value": false
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Select from states we serve...",
@@ -125,7 +129,8 @@ export let formFields = [
                 "text": "Michigan",
                 "value": "michigan"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "The county is...",
@@ -135,7 +140,8 @@ export let formFields = [
             {
                 "textType": "text"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "The zip code is...",
@@ -145,7 +151,8 @@ export let formFields = [
             {
                 "textType": "zip"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "What is your estimated credit score?",
@@ -202,7 +209,8 @@ export let formFields = [
                 "subtext": "599 & below",
                 "value": "fair"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Check up to three loan terms you would like to see",
@@ -246,7 +254,8 @@ export let formFields = [
                 "text": "3 Yr ARM",
                 "name": "3yrarm"
             }
-        ]
+        ],
+        "completed": false
     }
 ];
 
@@ -266,7 +275,8 @@ export let purchasePaymentField = {
         {
             "textType": "percentage"
         }
-    ]
+    ],
+    "completed": false
 }
 
 export let refinancePaymentField = {
@@ -277,7 +287,8 @@ export let refinancePaymentField = {
         {
             "textType": "money"
         }
-    ]
+    ],
+    "completed": false
 }
 
 export let refinanceQuestions = [
@@ -289,7 +300,8 @@ export let refinanceQuestions = [
             {
                 "textType": "money"
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Would you like to borrow cash? How much?",
@@ -299,7 +311,8 @@ export let refinanceQuestions = [
             {
                 "textType": "money"
             }
-        ]
+        ],
+        "completed": false
     }
 ]
 
@@ -318,7 +331,8 @@ export let militaryFields = [
                 "text": "No",
                 "value": false
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Is this 1st time use?",
@@ -334,7 +348,8 @@ export let militaryFields = [
                 "text": "No",
                 "value": false
             }
-        ]
+        ],
+        "completed": false
     },
     {
         "text": "Are you VA funding fee exempt?",
@@ -350,6 +365,7 @@ export let militaryFields = [
                 "text": "No",
                 "value": false
             }
-        ]
+        ],
+        "completed": false
     }
 ]

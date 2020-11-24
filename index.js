@@ -6,16 +6,13 @@ let questionCount = Object.keys(formFields).length;
 let currentQuestion;
 let currentQuestionIndex = 0;
 let answers = {};
-let inputGiven = false;
-let warningPresent = false;
 
 display();
-nextBtn.onclick = function() { next() };
-backBtn.onclick = function() { back() };
+nextBtn.onclick = () => next();
+backBtn.onclick = () => back();
 
 function display() {
     displayNextBack();
-    updateNextBack();
     showProgress();
     displayText();
     styleOptions();
@@ -108,34 +105,39 @@ function handleFields(question) {
     handleTypeTextfield(question);
     handleTypeCheckboxes(question);
     handleRemainingMortgageWarning(question)
+    updateNextButton();
+}
+
+function updateNextButton() {
+    let currentQuestion = getCurrentQuestion();
+    let nextBtn = document.getElementById('nextBtn');
+    if (currentQuestion['completed']) {
+        nextBtn.style.backgroundColor = 'lime';
+    } else {
+        nextBtn.style.backgroundColor = 'red';
+    }
 }
 
 function updateAnswers(l, v) {
     answers[l] = v;
 }
 
-function allowNextTypeOptions(question) {
-    return question['name'] in answers ? inputGiven = true : inputGiven = false;
-}
-
-function addOptionsEventListener(btn, name, value) {
-    btn.onclick = function() {
+function addOptionsEventListener(btn, name, value, question) {
+    btn.onclick = () => {
         let buttons = document.querySelectorAll('#formOptions > button');
         for (let button of buttons) {
             button.classList.remove('selected');
         }
         updateAnswers(name, value);
         btn.classList.add('selected');
-        inputGiven = true;
-        updateNextBack();
+        question['completed'] = true;
+        updateNextButton();
     };
 }
 
 function handleTypeOptions(question) {
     let fields = question['fields'];
-    if (question['type'] === 'options') {
-        allowNextTypeOptions(question);
-        
+    if (question['type'] === 'options') {        
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let value = fields[i]['value'];
@@ -163,7 +165,7 @@ function handleTypeOptions(question) {
                 }
             }
 
-            addOptionsEventListener(btn, name, value);
+            addOptionsEventListener(btn, name, value, question);
             formOptions.appendChild(btn);
         }
     }
@@ -179,8 +181,6 @@ function buildTypeOptionsButton(btn, name, value) {
 function handleTypeOptionsLong(question) {
     let fields = question['fields'];
     if (question['type'] === 'options-long') {
-        allowNextTypeOptions(question);
-
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let value = fields[i]['value'];
@@ -207,7 +207,7 @@ function handleTypeOptionsLong(question) {
                 btn.classList.add('selected');
             }
 
-            addOptionsEventListener(btn, name, value);
+            addOptionsEventListener(btn, name, value, question);
             formOptions.appendChild(btn);
         }
     }
@@ -238,7 +238,8 @@ function handleTypeNewPurchase(question) {
         warning.id = 'newPurchaseWarning';
         warning.classList.add('warning');
 
-        span1.innerHTML, span2.innerHTML = '$';
+        span1.innerHTML = '$';
+        span2.innerHTML = '$';
         span3.innerHTML = '%';
 
         let elements = [label1, span1, input1, label2, span2, input2, spacer, span3, input3, warning];
@@ -278,33 +279,22 @@ function handleTypeNewPurchaseInteraction() {
     let purchasePriceInput = document.getElementById('purchasePrice');
     let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
-    let inputs = [purchasePriceInput, downpaymentAbsoluteInput, downpaymentPercentageInput];
 
     purchasePriceInput.addEventListener('keyup', event => {
-        inputGivenNewPayment();
         if (downpaymentAbsoluteInput.value) {
             downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
-        inputGivenNewPayment();
         if (purchasePriceInput.value) {
             downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
     downpaymentPercentageInput.addEventListener('keyup', event => {
-        inputGivenNewPayment();
         if (purchasePriceInput.value) {
             downpaymentAbsoluteInput.value = getNewDownpaymentAbsoluteInputValue();
         }
     });
-
-    function inputGivenNewPayment() {
-        if (purchasePriceInput.value && downpaymentAbsoluteInput.value && downpaymentPercentageInput.value) {
-            inputGiven = true;
-            updateNextBack();
-        }
-    }
 
     function getNewDownpaymentPercentageInputValue() {
         let newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
@@ -330,16 +320,10 @@ function handleTypeNewPurchaseWarning() {
         inputs[i].addEventListener('keyup', event => {
             if (downpaymentPercentageInput.value < 3 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooLittleWarningText;
-                warningPresent = true;
-                updateNextBack();
             } else if (downpaymentPercentageInput.value > 99 && downpaymentAbsoluteInput.value) {
                 warning.innerHTML = tooMuchWarningText;
-                warningPresent = true;
-                updateNextBack();
             } else {
                 warning.innerHTML = '';
-                warningPresent = false;
-                updateNextBack();
             }
         });
     }
@@ -372,29 +356,26 @@ function addZipFilterEventListener(input) {
     });
 }
 
-function addZipValidationEventListener(input) {
+function addZipValidationEventListener(input, question) {
     input.addEventListener('keyup', event => {
-        let state = getState(input.value);
+        let state = getStateFromZip(input.value);
     
         if (state === answers['state']) {
-            inputGiven = true;
-            warningPresent = false;
-            updateNextBack();
+            question['completed'] = true;
         } else {
-            inputGiven = false;
-            warningPresent = true;
-            updateNextBack();
+            question['completed'] = false;
         }
+        updateNextButton();
     });
 }
 
-function addZipWarningEventListener(input) {
+function addZipWarningEventListener(input, question) {
     let warningText = 'Please enter a zip code belonging to the state provided.';
 
     input.addEventListener('keyup', event => {
         let warning = document.getElementById('textfieldWarning');
 
-        if (warningPresent) {
+        if (!(question['completed'])) {
             warning.innerHTML = warningText;
         } else {
             warning.innerHTML = '';
@@ -402,7 +383,7 @@ function addZipWarningEventListener(input) {
     });
 }
 
-function getState(zipcode) {
+function getStateFromZip(zipcode) {
     // Ensure you don't parse codes that start with 0 as octal values
     zipcode = parseInt(zipcode,10);
 
@@ -473,18 +454,6 @@ function getState(zipcode) {
     return state[0].long.toLowerCase();
 }
 
-function addMoneyValidationEventListener(input) {
-    input.addEventListener('keyup', event => {
-        if (input.value.length > 0) {
-            inputGiven = true;
-            updateNextBack();
-        } else {
-            inputGiven = false;
-            updateNextBack();
-        }
-    });
-}
-
 function handleTypeTextfield(question) {
     if (question['type'] === 'textfield') {
         let label = document.createElement('label');
@@ -497,11 +466,11 @@ function handleTypeTextfield(question) {
         warning.innerHTML = '';
 
         if (name === 'zip') {
-            handleTypeZip(input);
+            handleTypeZip(input, question);
         } else if (question['fields'][0]['textType'] === 'money') {
-            handleTypeMoney(input, label);
+            handleTypeMoney(input, label, question);
         } else {
-            handleTypeCounty(input);
+            handleTypeCounty(input, question);
         }
 
         buildTypeTextfieldDisplay(input, label, name);
@@ -511,12 +480,10 @@ function handleTypeTextfield(question) {
         // State management
         if (name in answers) {
             input.value = answers[name];
-            inputGiven = true;
         }
     }
 }
 
-// These might screw up state management
 function buildTypeTextfieldDisplay(input, label, name) {
     label.classList.add('input-wrapper');
     input.classList.add('input');
@@ -525,17 +492,16 @@ function buildTypeTextfieldDisplay(input, label, name) {
     label.appendChild(input);
 }
 
-function handleTypeZip(input) {
+function handleTypeZip(input, question) {
     addZipFilterEventListener(input);
-    addZipValidationEventListener(input);
-    addZipWarningEventListener(input);
+    addZipValidationEventListener(input, question);
+    addZipWarningEventListener(input, question);
     input.placeholder = '85233';
     input.maxLength = 5;
     input.pattern = '[a-z]{1,15}';
 }
 
-function handleTypeMoney(input, label) {
-    addMoneyValidationEventListener(input);
+function handleTypeMoney(input, label, question) {
     input.maxLength = 15;
     let span = document.createElement('span');
     span.innerHTML = '$';
@@ -545,36 +511,53 @@ function handleTypeMoney(input, label) {
     let autoInput;
     autoInput = new AutoNumeric(input, 'integerPos');
     autoInput.options.modifyValueOnWheel(false);
+
+    input.addEventListener('keyup', event => {
+        if (question['name'] !== 'remainingMortgageBalance') {
+            question['completed'] = input.value.length > 0 ? true : false;
+        } else {
+            if ('propertyValue' in answers && input.value) {
+                let value = filterCommaNumber(input.value);
+
+                if (value > answers['propertyValue']) {
+                    question['completed'] = false;
+                } else {
+                    question['completed'] = true;
+                }
+            }
+
+        }
+        updateNextButton();
+    });
 }
 
-function handleTypeCounty(input) {
-    addCountyValidationEventListener(input);
-    addCountyWarningEventListener(input);
+function handleTypeCounty(input, question) {
+    addCountyValidationEventListener(input, question);
+    addCountyWarningEventListener(input, question);
     addTitleCaseEventListener(input);
     input.placeholder = 'Maricopa';
 }
 
-function addCountyValidationEventListener(input) {
+function addCountyValidationEventListener(input, question) {
     input.addEventListener('keyup', event => {
         let state = answers['state'];
 
-        if (!(counties[state].includes(input.value))) {
-            inputGiven = false;
-            warningPresent = true;
+        if (counties[state].includes(input.value)) {
+            question['completed'] = true;
         } else {
-            inputGiven = true;
-            warningPresent = false;
+            question['completed'] = false;
         }
+        updateNextButton();
     });
 }
 
-function addCountyWarningEventListener(input) {
+function addCountyWarningEventListener(input, question) {
     let warningText = 'Please enter a county belonging to the state provided.';
 
     input.addEventListener('keyup', event => {
         let warning = document.getElementById('textfieldWarning');
 
-        if (warningPresent) {
+        if (!(question['completed'])) {
             warning.innerHTML = warningText;
         } else {
             warning.innerHTML = '';
@@ -604,7 +587,7 @@ function handleRemainingMortgageWarning(question) {
         formOptions.appendChild(warning);
 
         displayWarning();
-        input.addEventListener('keyup', event => { displayWarning(); });
+        input.addEventListener('keyup', event => displayWarning());
 
         function displayWarning() {
             if ('propertyValue' in answers && input.value) {
@@ -612,12 +595,8 @@ function handleRemainingMortgageWarning(question) {
 
                 if (value > answers['propertyValue']) {
                     warning.innerHTML = warningText;
-                    warningPresent = true;
-                    updateNextBack();
                 } else {
                     warning.innerHTML = '';
-                    warningPresent = false;
-                    updateNextBack();
                 }
             }
         }
@@ -627,8 +606,6 @@ function handleRemainingMortgageWarning(question) {
 function handleTypeCheckboxes(question) {
     let fields = question['fields'];
     if (question['type'] === 'checkboxes') {
-        allowNextTypeOptions(question);
-
         let checkboxContainer = document.createElement('div');
         checkboxContainer.classList.add('checkboxes-container');
         let answerName = question['name']
@@ -659,16 +636,15 @@ function handleTypeCheckboxes(question) {
 
             checkboxContainer.appendChild(checkboxWrapper);
 
-            label.onclick = function() {
+            checkbox.addEventListener('change', event => {
                 let checked = document.querySelectorAll('.checkbox:checked');
-                if (checked.length !== 0) {
-                    inputGiven = true;
-                    updateNextBack();
-                } else {
-                    inputGiven = false;
-                    updateNextBack();
+                if (event.target.checked) {
+                    question['completed'] = true;
+                } else if (checked.length === 0) {
+                    question['completed'] = false;
                 }
-            };
+                updateNextButton();
+            });
 
             if (answerName in answers && answers[answerName].includes(name)) {
                 checkbox.checked = true;
@@ -684,7 +660,7 @@ function handleTypeCheckboxes(question) {
 function limitCheckboxCount(limit) {
     let checkboxes = document.getElementsByClassName('checkbox');         
     for (let i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].onclick = function() {
+        checkboxes[i].onclick = () => {
             let checkedcount = 0;
             for (let i = 0; i < checkboxes.length; i++) {
                 checkedcount += (checkboxes[i].checked) ? 1 : 0;
@@ -769,8 +745,6 @@ function handleVALoanCase() {
     }
 }
 
-// For removing questions when conditionals get updated
-
 function updateFields() {
     replaceRefinanceFields();
     replacePurchaseField();
@@ -813,21 +787,18 @@ function replacePurchaseField() {
 // For handling next/back functionality
 
 function next() {
-    if (inputGiven && !(warningPresent)) {
-        inputGiven = false;
+    let currentQuestion = getCurrentQuestion();
+    if (currentQuestion['completed']) {
         questionCount = Object.keys(formFields).length;
 
-        updateNextBack();
         handleConditionals();
         updateFields();
         getInput();
-
+    
         if (currentQuestionIndex <= questionCount) {
             currentQuestionIndex++;
             display();
-        }
-
-        console.log(answers);
+        }    
     }
 }
 
@@ -844,36 +815,27 @@ function displayNextBack() {
     backBtn.style.display = 'block';
     nextBtn.style.display = 'block';
     nextBtn.innerHTML = 'Next';
-    nextBtn.onclick = function() { next() };
+    nextBtn.onclick = () => { next() };
 
     if (currentQuestionIndex <= 0) {
         backBtn.style.display = 'none';
     }
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
-        nextBtn.onclick = function() {
-            if (inputGiven && !(warningPresent)) {
-                submit();
-            }
+        nextBtn.onclick = () => {
+            submit();
         };
 
         // Add code that makes button trigger api request
     }
 }
 
-function updateNextBack() {
-    if (!(inputGiven) || warningPresent) {
-        nextBtn.style.backgroundColor = 'tomato';
-        nextBtn.style.color = 'black';
-    } else {
-        nextBtn.style.backgroundColor = '#0e508b';
-        nextBtn.style.color = 'white';
-    }
-}
-
 function submit() {
-    getInput();
-    present();
+    let currentQuestion = getCurrentQuestion();
+    if (currentQuestion['completed']) {
+        getInput();
+        present();
+    }
 }
 
 function present() {
