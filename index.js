@@ -114,8 +114,8 @@ function updateAnswers(l, v) {
     answers[l] = v;
 }
 
-function allowNextTypeOptions(q) {
-    return q['name'] in answers ? inputGiven = true : inputGiven = false;
+function allowNextTypeOptions(question) {
+    return question['name'] in answers ? inputGiven = true : inputGiven = false;
 }
 
 function addOptionsEventListener(btn, name, value) {
@@ -278,6 +278,7 @@ function handleTypeNewPurchaseInteraction() {
     let purchasePriceInput = document.getElementById('purchasePrice');
     let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+    let inputs = [purchasePriceInput, downpaymentAbsoluteInput, downpaymentPercentageInput];
 
     purchasePriceInput.addEventListener('keyup', event => {
         inputGivenNewPayment();
@@ -321,9 +322,7 @@ function handleTypeNewPurchaseWarning() {
     let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
     let inputs = [purchasePriceInput, downpaymentAbsoluteInput, downpaymentPercentageInput];
-
     let warning = document.getElementById('newPurchaseWarning');
-
     let tooLittleWarningText = 'Down payment should be greater than or equal to 3% of purchase price.';
     let tooMuchWarningText = 'Down payment must be less than purchase price.';
 
@@ -662,11 +661,11 @@ function handleTypeCheckboxes(question) {
 
             label.onclick = function() {
                 let checked = document.querySelectorAll('.checkbox:checked');
-                if (checked.length === 0) {
-                    inputGiven = false;
+                if (checked.length !== 0) {
+                    inputGiven = true;
                     updateNextBack();
                 } else {
-                    inputGiven = true;
+                    inputGiven = false;
                     updateNextBack();
                 }
             };
