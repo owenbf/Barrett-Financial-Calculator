@@ -52,6 +52,12 @@ function filterCommaNumber(n) {
     return (p === NaN ? 0 : p);
 }
 
+function writeNumberToAutoNumeric(input, num) {
+    let id = input.id;
+    let element = AutoNumeric.getAutoNumericElement('#'+id);
+    element.set(num);
+}
+
 function getTextfieldInput() {
     if (document.getElementById('currentInputField')) {
         let currentInputField = document.getElementById('currentInputField');
@@ -112,9 +118,9 @@ function updateNextButton() {
     let currentQuestion = getCurrentQuestion();
     let nextBtn = document.getElementById('nextBtn');
     if (currentQuestion['completed']) {
-        nextBtn.style.backgroundColor = 'lime';
+        nextBtn.style.backgroundColor = '#0e508b';
     } else {
-        nextBtn.style.backgroundColor = 'red';
+        nextBtn.style.backgroundColor = '#bed7ed';
     }
 }
 
@@ -137,7 +143,7 @@ function addOptionsEventListener(btn, name, value, question) {
 
 function handleTypeOptions(question) {
     let fields = question['fields'];
-    if (question['type'] === 'options') {        
+    if (question['type'] === 'options') {
         for (let i = 0; i < fields.length; i++) {
             let text = fields[i]['text'];
             let value = fields[i]['value'];
@@ -273,6 +279,7 @@ function handleTypeNewPurchaseFunctionality() {
     handleTypeNewPurchaseInteraction();
     handleTypeNewPurchaseSaveState();
     handleTypeNewPurchaseWarning();
+    handleTypeNewPurchaseCompletion();
 }
 
 function handleTypeNewPurchaseInteraction() {
@@ -285,14 +292,16 @@ function handleTypeNewPurchaseInteraction() {
             downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
+
     downpaymentAbsoluteInput.addEventListener('keyup', event => {
         if (purchasePriceInput.value) {
             downpaymentPercentageInput.value = getNewDownpaymentPercentageInputValue();
         }
     });
+
     downpaymentPercentageInput.addEventListener('keyup', event => {
         if (purchasePriceInput.value) {
-            downpaymentAbsoluteInput.value = getNewDownpaymentAbsoluteInputValue();
+            writeNumberToAutoNumeric(downpaymentAbsoluteInput, getNewDownpaymentAbsoluteInputValue());
         }
     });
 
@@ -306,6 +315,30 @@ function handleTypeNewPurchaseInteraction() {
         return (newValue === NaN ? 0 : newValue);
     }
 }
+
+function handleTypeNewPurchaseCompletion() {
+    let purchasePriceInput = document.getElementById('purchasePrice');
+    let downpaymentAbsoluteInput = document.getElementById('downpaymentAbsolute');
+    let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
+    let inputs = [purchasePriceInput, downpaymentAbsoluteInput, downpaymentPercentageInput];
+
+    inputs.forEach(input => {
+        addEventListener('keyup', event => {
+            let values = inputs.map(input => input.value);
+            let inputsFilled = values.filter(value => value.length > 0).length === 3;
+            let inputsValid = !(downpaymentPercentageInput.value < 3 || downpaymentPercentageInput.value > 99);
+            let currentQuestion = getCurrentQuestion();
+
+            if (inputsFilled && inputsValid) {
+                currentQuestion['completed'] = true;
+            } else {
+                currentQuestion['completed'] = false;
+            }
+            updateNextButton();
+        });
+    });
+}
+
 
 function handleTypeNewPurchaseWarning() {
     let purchasePriceInput = document.getElementById('purchasePrice');
@@ -335,11 +368,11 @@ function handleTypeNewPurchaseSaveState() {
     let downpaymentPercentageInput = document.getElementById('downpaymentPercentage');
 
     if ('purchasePrice' in answers) {
-        purchasePriceInput.value = answers['purchasePrice'];
+        writeNumberToAutoNumeric(purchasePriceInput, answers['purchasePrice']);
     }
 
     if ('downpaymentAbsolute' in answers) {
-        downpaymentAbsoluteInput.value = answers['downpaymentAbsolute'];
+        writeNumberToAutoNumeric(downpaymentAbsoluteInput, answers['downpaymentAbsolute']);
     }
 
     if ('downpaymentPercentage' in answers) {
@@ -446,7 +479,7 @@ function getStateFromZip(zipcode) {
         return s.min <= zipcode && s.max >= zipcode;        
     });
 
-    if (state.length === 0){
+    if (state.length === 0) {
         return false;
     } else if (state.length > 1) {
         console.error("Found two states");
@@ -470,6 +503,7 @@ function handleTypeTextfield(question) {
         } else if (question['fields'][0]['textType'] === 'money') {
             handleTypeMoney(input, label, question);
         } else {
+            input.onsubmit = 'return false';
             handleTypeCounty(input, question);
         }
 
@@ -477,9 +511,12 @@ function handleTypeTextfield(question) {
         formOptions.appendChild(label);
         formOptions.appendChild(warning);
 
-        // State management
         if (name in answers) {
-            input.value = answers[name];
+            if (question['fields'][0]['textType'] === 'money') {
+                writeNumberToAutoNumeric(input, answers[name]);
+            } else {
+                if (name in answers) input.value = answers[name];
+            }
         }
     }
 }
@@ -700,6 +737,7 @@ function handlePurchaseCase() {
     if (answers['refinanceOrPurchase'] === 'purchase' && !(mortgageQuestionExists)) {
         formFields.splice(indexOfCreditScore, 0, purchasePaymentField);
     }
+
     if (answers['refinanceOrPurchase'] === 'refinance' && !(mortgageQuestionExists) && !(formFields.includes(refinancePaymentField))) {
         formFields.splice(indexOfCreditScore, 0, refinancePaymentField);
         for (let i = 0; i < refinanceQuestions.length; i++) {
@@ -815,16 +853,14 @@ function displayNextBack() {
     backBtn.style.display = 'block';
     nextBtn.style.display = 'block';
     nextBtn.innerHTML = 'Next';
-    nextBtn.onclick = () => { next() };
+    nextBtn.onclick = () => next();
 
     if (currentQuestionIndex <= 0) {
         backBtn.style.display = 'none';
     }
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
-        nextBtn.onclick = () => {
-            submit();
-        };
+        nextBtn.onclick = () => submit();
 
         // Add code that makes button trigger api request
     }
@@ -854,11 +890,8 @@ function showProgress() {
 
 function incrementOnKeypress(event) {
     if (event.which === 13) { // Enter/return was pressed
-        if (currentQuestionIndex+1 >= questionCount) {
-            submit();
-        } else {
-            next();
-        }
+        event.preventDefault();
+        currentQuestionIndex+1 >= questionCount ? submit() : next();
     }
 }
 
