@@ -914,10 +914,13 @@ function xhrRates() {
 }
 
 function present() {
-    presentationPage.style.display = 'flex';
+    presentationPage.style.display = 'block';
     formPage.style.display = 'none';
     nextBtn.style.display = 'none';
     backBtn.style.display = 'none';
+
+    let clone = clonee.cloneNode(true);
+    presentationPage.appendChild(clone);
 }
 
 function showProgress() {
