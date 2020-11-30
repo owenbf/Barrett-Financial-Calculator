@@ -7,6 +7,7 @@
 body {
     font-family: 'Poppins', sans-serif;
     font-weight: 200;
+    position: relative;
 }
 
 li {
@@ -306,6 +307,44 @@ a {
 .editor-button:active {
     background-color: #0e508b;
     color: white;
+}
+
+/* wip */
+
+#editor {
+    display: none;
+    background-color: white;
+    width: 24rem;
+    position: fixed;
+    height: 90vh;
+    top: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#exitEditBtn {
+    padding: .5rem 1rem;
+    border: 2px solid #0e508b;
+    color: #0e508b;
+    background-color: inherit;
+    border-radius: .25rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+#exitEditBtn:hover {
+    background-color: #bed7ed;
+}
+
+#exitEditBtn:active {
+    background-color: #0e508b;
+    color: white;
+}
+
+.editor-head > h2 {
+    text-align: center;
 }
 
 .input-wrapper {

@@ -307,12 +307,12 @@ function handleTypeNewPurchaseInteraction() {
 
     function getNewDownpaymentPercentageInputValue() {
         let newValue = parseInt((filterCommaNumber(downpaymentAbsoluteInput.value) / filterCommaNumber(purchasePriceInput.value)) * 100);
-        return (newValue === NaN ? 0 : newValue);
+        return (isNaN(newValue) ? '' : newValue);
     }
 
     function getNewDownpaymentAbsoluteInputValue() {
         let newValue =  parseInt((filterCommaNumber(downpaymentPercentageInput.value) / 100) * filterCommaNumber(purchasePriceInput.value));
-        return (newValue === NaN ? 0 : newValue);
+        return (isNaN(newValue) ? '' : newValue);
     }
 }
 
@@ -914,6 +914,7 @@ function xhrRates() {
 }
 
 function present() {
+    addEditorButtonOnclick();
     presentationPage.style.display = 'block';
     formPage.style.display = 'none';
     nextBtn.style.display = 'none';
@@ -921,6 +922,24 @@ function present() {
 
     let clone = clonee.cloneNode(true);
     presentationPage.appendChild(clone);
+}
+
+// wip
+function addEditorButtonOnclick() {
+    let editorBtn = document.getElementById('editorBtn');
+    let editor = document.getElementById('editor');
+    editorBtn.onclick = () => {
+        editor.style.display = 'block';
+        addExitEditBtnOnclick();
+    };
+}
+
+function addExitEditBtnOnclick() {
+    let editor = document.getElementById('editor');
+    let exitEditBtn = document.getElementById('exitEditBtn');
+    exitEditBtn.onclick = () => {
+        editor.style.display = 'none';
+    };
 }
 
 function showProgress() {
