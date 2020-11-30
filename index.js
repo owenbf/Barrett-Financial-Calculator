@@ -931,6 +931,7 @@ function addEditorButtonOnclick() {
     editorBtn.onclick = () => {
         editor.style.display = 'block';
         addExitEditBtnOnclick();
+        handleEditor();
     };
 }
 
@@ -940,6 +941,16 @@ function addExitEditBtnOnclick() {
     exitEditBtn.onclick = () => {
         editor.style.display = 'none';
     };
+}
+
+function handleEditor() {
+    let editorBody = document.getElementById('editorBody');
+    editorBody.innerHTML = '';
+    formFields.forEach(field => {
+        let newTitle = document.createElement('p');
+        newTitle.innerHTML = field['editorText'];
+        editorBody.appendChild(newTitle);
+    });
 }
 
 function showProgress() {

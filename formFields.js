@@ -1,6 +1,7 @@
 export let formFields = [
     {
         "text": "I want to...",
+        "editorText": "Loan Purpose",
         "type": "options",
         "name": "refinanceOrPurchase",
         "fields": [
@@ -19,6 +20,7 @@ export let formFields = [
     },
     {
         "text": "This will be my...",
+        "editorText": "Occupancy Type",
         "type": "options",
         "name": "loanPurpose",
         "fields": [
@@ -42,6 +44,7 @@ export let formFields = [
     },
     {
         "text": "This property is a...",
+        "editorText": "Property Type",
         "type": "options",
         "name": "residenceType",
         "fields": [
@@ -70,6 +73,7 @@ export let formFields = [
     },
     {
         "text": "Have you or your spouse ever served in the military?",
+        "editorText": "Military Service",
         "type": "options",
         "name": "isMilitary",
         "fields": [
@@ -86,6 +90,7 @@ export let formFields = [
     },
     {
         "text": "Select from states we serve...",
+        "editorText": "State",
         "type": "options-long",
         "name": "state",
         "fields": [
@@ -134,6 +139,7 @@ export let formFields = [
     },
     {
         "text": "The county is...",
+        "editorText": "County",
         "type": "textfield",
         "name": "county",
         "fields": [
@@ -145,6 +151,7 @@ export let formFields = [
     },
     {
         "text": "The zip code is...",
+        "editorText": "Zip Code",
         "type": "textfield",
         "name": "zip",
         "fields": [
@@ -156,6 +163,7 @@ export let formFields = [
     },
     {
         "text": "What is your estimated credit score?",
+        "editorText": "Estimated Credit Score",
         "type": "options-long",
         "name": "creditScore",
         "fields": [
@@ -214,6 +222,7 @@ export let formFields = [
     },
     {
         "text": "Check up to three loan terms you would like to see",
+        "editorText": "Select Loan Terms",
         "max": 3,
         "type": "checkboxes",
         "name": "loanTerms",
@@ -263,6 +272,8 @@ export let purchasePaymentField = {
     "text": "",
     "text1": "Purchase price:",
     "text2": "Down payment:",
+    "editorText1": "Purchase Price",
+    "editorText2": "Down Payment",
     "type": "newPurchase",
     "name": "remainingMortgageBalance",
     "fields": [
@@ -281,6 +292,7 @@ export let purchasePaymentField = {
 
 export let refinancePaymentField = {
     "text": "What is the estimated property value?",
+    "editorText": "Property Value",
     "type": "textfield",
     "name": "propertyValue",
     "fields": [
@@ -294,6 +306,7 @@ export let refinancePaymentField = {
 export let refinanceQuestions = [
     {
         "text": "What is the remaining balance of your mortgage?",
+        "editorText": "Remaining Mortgage Balance",
         "type": "textfield",
         "name": "remainingMortgageBalance",
         "fields": [
@@ -305,6 +318,7 @@ export let refinanceQuestions = [
     },
     {
         "text": "Would you like to borrow cash? How much?",
+        "editorText": "Cash Out Amount",
         "type": "textfield",
         "name": "borrowAmount",
         "fields": [

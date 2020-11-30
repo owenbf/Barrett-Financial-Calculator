@@ -318,6 +318,8 @@ a {
     position: fixed;
     height: 90vh;
     top: 5vh;
+    padding: 2rem;
+    overflow: scroll;
     left: 50%;
     transform: translateX(-50%);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -343,7 +345,7 @@ a {
     color: white;
 }
 
-.editor-head > h2 {
+#editorHead > h2 {
     text-align: center;
 }
 
