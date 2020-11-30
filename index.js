@@ -110,7 +110,7 @@ function handleFields(question) {
     handleTypeNewPurchase(question);
     handleTypeTextfield(question);
     handleTypeCheckboxes(question);
-    handleRemainingMortgageWarning(question)
+    handleRemainingMortgageWarning(question);
     updateNextButton();
 }
 
@@ -861,8 +861,6 @@ function displayNextBack() {
     if (currentQuestionIndex+1 >= questionCount) {
         nextBtn.innerHTML = 'Submit';
         nextBtn.onclick = () => submit();
-
-        // Add code that makes button trigger api request
     }
 }
 
@@ -871,7 +869,48 @@ function submit() {
     if (currentQuestion['completed']) {
         getInput();
         present();
+        //getRateSheet();
+        xhrRates();
     }
+}
+
+function fetchRates() {
+    let url = 'https://he6qq2q8ac.execute-api.us-east-2.amazonaws.com/prod';
+    let payload = "{\n  \"borrowerInformation\": {\n    \"assetDocumentation\": \"Verified\",\n    \"debtToIncomeRatio\": 15.0,\n    \"pledgedAssets\": false,\n    \"citizenship\": \"USCitizen\",\n    \"employmentDocumentation\": \"Verified\",\n    \"fico\": 850,\n    \"firstName\": \"test\",\n    \"lastName\": \"test1\",\n    \"vaFirstTimeUse\": true,\n    \"firstTimeHomeBuyer\": false,\n    \"incomeDocumentation\": \"Verified\",\n    \"monthlyIncome\": 0.0,\n    \"monthsReserves\": 24,\n    \"selfEmployed\": true,\n    \"waiveEscrows\": false,\n    \"mortgageLatesX30\": 0,\n    \"mortgageLatesX60\": 0,\n    \"mortgageLatesX90\": 0,\n    \"mortgageLatesX120\": 0,\n    \"mortgageLatesRolling\": 0,\n    \"bankruptcy\": \"Never\",\n    \"foreclosure\": \"Never\",\n    \"bankStatementsForIncome\": \"NotApplicable\"\n  },\n  \"loanInformation\": {\n    \"loanPurpose\": \"Purchase\",\n    \"lienType\": \"First\",\n    \"amortizationTypes\": [\n      \"Fixed\"\n    ],\n    \"armFixedTerms\": [\n      \"FiveYear\"\n    ],\n    \"automatedUnderwritingSystem\": \"NotSpecified\",\n    \"borrowerPaidMI\": \"Yes\",\n    \"buydown\": \"None\",\n    \"cashOutAmount\": 0.0,\n    \"desiredLockPeriod\": 0,\n    \"desiredPrice\": 0.0,\n    \"desiredRate\": 0.0,\n    \"feesIn\": \"No\",\n    \"expandedApprovalLevel\": \"NotApplicable\",\n    \"fhaCaseAssigned\": \"2017-02-06T06:00:00Z\",\n    \"fhaCaseEndorsement\": \"2017-02-06T06:00:00Z\",\n    \"interestOnly\": false,\n    \"baseLoanAmount\": 150000.0,\n    \"secondLienAmount\": 0.0,\n    \"helocDrawnAmount\": 0.0,\n    \"helocLineAmount\": 0.0,\n    \"loanTerms\": [\n      \"ThirtyYear\",\n      \"TwentyFiveYear\"\n    ],\n    \"loanType\": \"Conventional\",\n    \"prepaymentPenalty\": \"None\",\n    \"exemptFromVAFundingFee\": false,\n    \"includeLOCompensationInPricing\": \"YesLenderPaid\",\n    \"calculateTotalLoanAmount\": true\n  },\n  \"propertyInformation\": {\n    \"appraisedValue\": 225000.0,\n    \"occupancy\": \"PrimaryResidence\",\n    \"propertyStreetAddress\": \"string\",\n    \"county\": \"Collin\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75024\",\n    \"propertyType\": \"SingleFamily\",\n    \"corporateRelocation\": false,\n    \"salesPrice\": 225000.0,\n    \"numberOfStories\": 1,\n    \"numberOfUnits\": \"OneUnit\",\n    \"construction\": false\n  },\n  \"representativeFICO\": 850,\n  \"loanLevelDebtToIncomeRatio\": 18.0,\n  \"customerInternalId\": \"OBSearch\"\n}"
+
+    fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        data: payload
+    }).then(a => {
+        return a.json();
+    }).then(json => {
+        console.log(json)
+    });
+}
+
+function xhrRates() {
+    let xhr = new XMLHttpRequest();
+    let url = 'https://he6qq2q8ac.execute-api.us-east-2.amazonaws.com/prod';
+    let payload = "{\n  \"borrowerInformation\": {\n    \"assetDocumentation\": \"Verified\",\n    \"debtToIncomeRatio\": 15.0,\n    \"pledgedAssets\": false,\n    \"citizenship\": \"USCitizen\",\n    \"employmentDocumentation\": \"Verified\",\n    \"fico\": 850,\n    \"firstName\": \"test\",\n    \"lastName\": \"test1\",\n    \"vaFirstTimeUse\": true,\n    \"firstTimeHomeBuyer\": false,\n    \"incomeDocumentation\": \"Verified\",\n    \"monthlyIncome\": 0.0,\n    \"monthsReserves\": 24,\n    \"selfEmployed\": true,\n    \"waiveEscrows\": false,\n    \"mortgageLatesX30\": 0,\n    \"mortgageLatesX60\": 0,\n    \"mortgageLatesX90\": 0,\n    \"mortgageLatesX120\": 0,\n    \"mortgageLatesRolling\": 0,\n    \"bankruptcy\": \"Never\",\n    \"foreclosure\": \"Never\",\n    \"bankStatementsForIncome\": \"NotApplicable\"\n  },\n  \"loanInformation\": {\n    \"loanPurpose\": \"Purchase\",\n    \"lienType\": \"First\",\n    \"amortizationTypes\": [\n      \"Fixed\"\n    ],\n    \"armFixedTerms\": [\n      \"FiveYear\"\n    ],\n    \"automatedUnderwritingSystem\": \"NotSpecified\",\n    \"borrowerPaidMI\": \"Yes\",\n    \"buydown\": \"None\",\n    \"cashOutAmount\": 0.0,\n    \"desiredLockPeriod\": 0,\n    \"desiredPrice\": 0.0,\n    \"desiredRate\": 0.0,\n    \"feesIn\": \"No\",\n    \"expandedApprovalLevel\": \"NotApplicable\",\n    \"fhaCaseAssigned\": \"2017-02-06T06:00:00Z\",\n    \"fhaCaseEndorsement\": \"2017-02-06T06:00:00Z\",\n    \"interestOnly\": false,\n    \"baseLoanAmount\": 150000.0,\n    \"secondLienAmount\": 0.0,\n    \"helocDrawnAmount\": 0.0,\n    \"helocLineAmount\": 0.0,\n    \"loanTerms\": [\n      \"ThirtyYear\",\n      \"TwentyFiveYear\"\n    ],\n    \"loanType\": \"Conventional\",\n    \"prepaymentPenalty\": \"None\",\n    \"exemptFromVAFundingFee\": false,\n    \"includeLOCompensationInPricing\": \"YesLenderPaid\",\n    \"calculateTotalLoanAmount\": true\n  },\n  \"propertyInformation\": {\n    \"appraisedValue\": 225000.0,\n    \"occupancy\": \"PrimaryResidence\",\n    \"propertyStreetAddress\": \"string\",\n    \"county\": \"Collin\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75024\",\n    \"propertyType\": \"SingleFamily\",\n    \"corporateRelocation\": false,\n    \"salesPrice\": 225000.0,\n    \"numberOfStories\": 1,\n    \"numberOfUnits\": \"OneUnit\",\n    \"construction\": false\n  },\n  \"representativeFICO\": 850,\n  \"loanLevelDebtToIncomeRatio\": 18.0,\n  \"customerInternalId\": \"OBSearch\"\n}"
+
+    xhr.open('POST', url);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.onreadystatechange = () => {
+        // Only run if the request is complete
+        if (xhr.readyState !== 4) return;
+    
+        // Process our return data
+        if (xhr.status >= 200 && xhr.status < 300) {
+            // What do when the request is successful
+            console.log(JSON.parse(xhr.responseText));
+        }
+    };
+    xhr.send(payload);
 }
 
 function present() {

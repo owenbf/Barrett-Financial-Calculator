@@ -188,14 +188,82 @@ a {
     align-items: center;
 }
 
+/* wip */
 .presentation {
+    padding-bottom: 8rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 2rem;
-    width: 36rem;
+    width: 90%;
     height: 30rem;
+}
+
+.presentation > h1 {
+    text-align: left;
+    border-bottom: 2px solid black;
+}
+
+.presentation > * {
+    width: 100%;
+    text-align: center;
+}
+
+.proposed-rates {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+}
+
+.proposed-rate {
+    width: 30%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.proposed-rate > h4 {
+    width: 100%;
+    background-color: #0e508b;
+    color: white;
+    margin-top: 0;
+    padding: .5rem;
+}
+
+.proposed-rate > div {
+    height: 8rem;
+}
+
+.rates {
+    margin-top: 4rem;
+    width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.rates > h4 {
+    margin: 0;
+    padding: 1rem;
+    background-color: #0e508b;
+    color: white;
+}
+
+.rates > table {
+    width: 100%;
+    border-spacing: 1rem;
+}
+
+.rates > table a {
+    color: #0e508b;
+    border-radius: .25rem;
+    padding: .25rem .75rem;
+    transition: background-color .25s ease-in-out;
+}
+
+.rates > table a:hover {
+    color: white;
+    background-color: #0e508b;
+}
+
+.spacer {
+    min-height: 8rem;
 }
 
 .input-wrapper {
