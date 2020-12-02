@@ -31,6 +31,7 @@
                 </div>
             </div>
         </div>
+        <div id="loader"></div>
         <div id="formPage" class="container-form">
             <form class="form" action="">
                 <div class="completion-bar-top" id="progressBar"></div>
@@ -49,108 +50,74 @@
             <div class="editor-button-wrapper">
                 <button class="editor-button" id="editorBtn">Edit my info</button>
             </div>
-            <div class="presentation" id="clonee">
+            <div class="presentation">
                 <h1>30 Year Fixed</h1>
                 <div class="proposed-rates">
                     <div class="proposed-rate">
                         <h4>Low rate</h4>
-                        <div class="rate-details-wrapper">
-                            <div class="rate-details">
-                                <div class="rate-detail rate">
-                                    <h6>Rate</h6>
-                                </div>
-                                <div class="rate-detail closing-costs">
-                                    <h6>Closing Costs</h6>
-                                </div>
-                                <div class="rate-detail monthly-payment">
-                                    <h6>Monthly Payment</h6>
-                                </div>
+                        <div class="rate-details">
+                            <div class="rate-detail">
+                                <h6>Rate</h6>
+                            </div>
+                            <div class="rate-detail closing-costs">
+                                <h6>Closing Costs</h6>
+                            </div>
+                            <div class="rate-detail monthly-payment">
+                                <h6>Monthly Payment</h6>
                             </div>
                         </div>
                     </div>
                     <div class="proposed-rate">
                         <h4>Rate with balanced costs & payments</h4>
-                        <div class="rate-details-wrapper">
-                            <div class="rate-details">
-                                <div class="rate-detail rate">
-                                    <h6>Rate</h6>
-                                </div>
-                                <div class="rate-detail closing-costs">
-                                    <h6>Closing Costs</h6>
-                                </div>
-                                <div class="rate-detail monthly-payment">
-                                    <h6>Monthly Payment</h6>
-                                </div>
+                        <div class="rate-details">
+                            <div class="rate-detail">
+                                <h6>Rate</h6>
+                            </div>
+                            <div class="rate-detail closing-costs">
+                                <h6>Closing Costs</h6>
+                            </div>
+                            <div class="rate-detail monthly-payment">
+                                <h6>Monthly Payment</h6>
                             </div>
                         </div>
                     </div>
                     <div class="proposed-rate">
                         <h4>Rate with low closing costs</h4>
-                        <div class="rate-details-wrapper">
-                            <div class="rate-details">
-                                <div class="rate-detail rate">
-                                    <h6>Rate</h6>
-                                </div>
-                                <div class="rate-detail closing-costs">
-                                    <h6>Closing Costs</h6>
-                                </div>
-                                <div class="rate-detail monthly-payment">
-                                    <h6>Monthly Payment</h6>
-                                </div>
+                        <div class="rate-details">
+                            <div class="rate-detail">
+                                <h6>Rate</h6>
+                                <p class="rate-value">2.75</p>
+                                <p class="apr-value">2.5</p>
+                            </div>
+                            <div class="rate-detail">
+                                <h6>Closing Costs</h6>
+                                <p class="closing-costs-value">1200</p>
+                            </div>
+                            <div class="rate-detail">
+                                <h6>Monthly Payment</h6>
+                                <p class="monthly-payment-value">120</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="rates">
                     <h4>Full range of rates</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rate</th>
-                                <th>Closing Costs</th>
-                                <th>Monthly P&I</th>
-                                <th>APR</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2.625%</td>
-                                <td>$2,612</td>
-                                <td>$86</td>
-                                <td>4.068%</td>
-                                <td><a href="#">See details</a></td>
-                            </tr>
-                            <tr>
-                                <td>2.625%</td>
-                                <td>$2,612</td>
-                                <td>$86</td>
-                                <td>4.068%</td>
-                                <td><a href="#">See details</a></td>
-                            </tr>
-                            <tr>
-                                <td>2.625%</td>
-                                <td>$2,612</td>
-                                <td>$86</td>
-                                <td>4.068%</td>
-                                <td><a href="#">See details</a></td>
-                            </tr>
-                            <tr>
-                                <td>2.625%</td>
-                                <td>$2,612</td>
-                                <td>$86</td>
-                                <td>4.068%</td>
-                                <td><a href="#">See details</a></td>
-                            </tr>
-                            <tr>
-                                <td>2.625%</td>
-                                <td>$2,612</td>
-                                <td>$86</td>
-                                <td>4.068%</td>
-                                <td><a href="#">See details</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="rates-table" id="ratesTableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rate</th>
+                                    <th>Closing Costs</th>
+                                    <th>Monthly P&I</th>
+                                    <th>APR</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                        <div class="gradient" id="gradient"></div>
+                    </div>
+                    <button id="expandRatesBtn">Show all rates</button>
                 </div>
             </div>
         </div>

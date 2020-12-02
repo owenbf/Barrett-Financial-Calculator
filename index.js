@@ -868,60 +868,188 @@ function submit() {
     let currentQuestion = getCurrentQuestion();
     if (currentQuestion['completed']) {
         getInput();
-        present();
-        //getRateSheet();
-        xhrRates();
+        loading();
+        getXhrRates();
     }
 }
 
-function fetchRates() {
-    let url = 'https://he6qq2q8ac.execute-api.us-east-2.amazonaws.com/prod';
-    let payload = "{\n  \"borrowerInformation\": {\n    \"assetDocumentation\": \"Verified\",\n    \"debtToIncomeRatio\": 15.0,\n    \"pledgedAssets\": false,\n    \"citizenship\": \"USCitizen\",\n    \"employmentDocumentation\": \"Verified\",\n    \"fico\": 850,\n    \"firstName\": \"test\",\n    \"lastName\": \"test1\",\n    \"vaFirstTimeUse\": true,\n    \"firstTimeHomeBuyer\": false,\n    \"incomeDocumentation\": \"Verified\",\n    \"monthlyIncome\": 0.0,\n    \"monthsReserves\": 24,\n    \"selfEmployed\": true,\n    \"waiveEscrows\": false,\n    \"mortgageLatesX30\": 0,\n    \"mortgageLatesX60\": 0,\n    \"mortgageLatesX90\": 0,\n    \"mortgageLatesX120\": 0,\n    \"mortgageLatesRolling\": 0,\n    \"bankruptcy\": \"Never\",\n    \"foreclosure\": \"Never\",\n    \"bankStatementsForIncome\": \"NotApplicable\"\n  },\n  \"loanInformation\": {\n    \"loanPurpose\": \"Purchase\",\n    \"lienType\": \"First\",\n    \"amortizationTypes\": [\n      \"Fixed\"\n    ],\n    \"armFixedTerms\": [\n      \"FiveYear\"\n    ],\n    \"automatedUnderwritingSystem\": \"NotSpecified\",\n    \"borrowerPaidMI\": \"Yes\",\n    \"buydown\": \"None\",\n    \"cashOutAmount\": 0.0,\n    \"desiredLockPeriod\": 0,\n    \"desiredPrice\": 0.0,\n    \"desiredRate\": 0.0,\n    \"feesIn\": \"No\",\n    \"expandedApprovalLevel\": \"NotApplicable\",\n    \"fhaCaseAssigned\": \"2017-02-06T06:00:00Z\",\n    \"fhaCaseEndorsement\": \"2017-02-06T06:00:00Z\",\n    \"interestOnly\": false,\n    \"baseLoanAmount\": 150000.0,\n    \"secondLienAmount\": 0.0,\n    \"helocDrawnAmount\": 0.0,\n    \"helocLineAmount\": 0.0,\n    \"loanTerms\": [\n      \"ThirtyYear\",\n      \"TwentyFiveYear\"\n    ],\n    \"loanType\": \"Conventional\",\n    \"prepaymentPenalty\": \"None\",\n    \"exemptFromVAFundingFee\": false,\n    \"includeLOCompensationInPricing\": \"YesLenderPaid\",\n    \"calculateTotalLoanAmount\": true\n  },\n  \"propertyInformation\": {\n    \"appraisedValue\": 225000.0,\n    \"occupancy\": \"PrimaryResidence\",\n    \"propertyStreetAddress\": \"string\",\n    \"county\": \"Collin\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75024\",\n    \"propertyType\": \"SingleFamily\",\n    \"corporateRelocation\": false,\n    \"salesPrice\": 225000.0,\n    \"numberOfStories\": 1,\n    \"numberOfUnits\": \"OneUnit\",\n    \"construction\": false\n  },\n  \"representativeFICO\": 850,\n  \"loanLevelDebtToIncomeRatio\": 18.0,\n  \"customerInternalId\": \"OBSearch\"\n}"
-
-    fetch(url, {
-        method: 'POST',
-        mode: 'no-cors',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        data: payload
-    }).then(a => {
-        return a.json();
-    }).then(json => {
-        console.log(json)
-    });
-}
-
-function xhrRates() {
+function getXhrRates() {
     let xhr = new XMLHttpRequest();
+    // this will need to be obscured in final code
     let url = 'https://he6qq2q8ac.execute-api.us-east-2.amazonaws.com/prod';
     let payload = "{\n  \"borrowerInformation\": {\n    \"assetDocumentation\": \"Verified\",\n    \"debtToIncomeRatio\": 15.0,\n    \"pledgedAssets\": false,\n    \"citizenship\": \"USCitizen\",\n    \"employmentDocumentation\": \"Verified\",\n    \"fico\": 850,\n    \"firstName\": \"test\",\n    \"lastName\": \"test1\",\n    \"vaFirstTimeUse\": true,\n    \"firstTimeHomeBuyer\": false,\n    \"incomeDocumentation\": \"Verified\",\n    \"monthlyIncome\": 0.0,\n    \"monthsReserves\": 24,\n    \"selfEmployed\": true,\n    \"waiveEscrows\": false,\n    \"mortgageLatesX30\": 0,\n    \"mortgageLatesX60\": 0,\n    \"mortgageLatesX90\": 0,\n    \"mortgageLatesX120\": 0,\n    \"mortgageLatesRolling\": 0,\n    \"bankruptcy\": \"Never\",\n    \"foreclosure\": \"Never\",\n    \"bankStatementsForIncome\": \"NotApplicable\"\n  },\n  \"loanInformation\": {\n    \"loanPurpose\": \"Purchase\",\n    \"lienType\": \"First\",\n    \"amortizationTypes\": [\n      \"Fixed\"\n    ],\n    \"armFixedTerms\": [\n      \"FiveYear\"\n    ],\n    \"automatedUnderwritingSystem\": \"NotSpecified\",\n    \"borrowerPaidMI\": \"Yes\",\n    \"buydown\": \"None\",\n    \"cashOutAmount\": 0.0,\n    \"desiredLockPeriod\": 0,\n    \"desiredPrice\": 0.0,\n    \"desiredRate\": 0.0,\n    \"feesIn\": \"No\",\n    \"expandedApprovalLevel\": \"NotApplicable\",\n    \"fhaCaseAssigned\": \"2017-02-06T06:00:00Z\",\n    \"fhaCaseEndorsement\": \"2017-02-06T06:00:00Z\",\n    \"interestOnly\": false,\n    \"baseLoanAmount\": 150000.0,\n    \"secondLienAmount\": 0.0,\n    \"helocDrawnAmount\": 0.0,\n    \"helocLineAmount\": 0.0,\n    \"loanTerms\": [\n      \"ThirtyYear\",\n      \"TwentyFiveYear\"\n    ],\n    \"loanType\": \"Conventional\",\n    \"prepaymentPenalty\": \"None\",\n    \"exemptFromVAFundingFee\": false,\n    \"includeLOCompensationInPricing\": \"YesLenderPaid\",\n    \"calculateTotalLoanAmount\": true\n  },\n  \"propertyInformation\": {\n    \"appraisedValue\": 225000.0,\n    \"occupancy\": \"PrimaryResidence\",\n    \"propertyStreetAddress\": \"string\",\n    \"county\": \"Collin\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75024\",\n    \"propertyType\": \"SingleFamily\",\n    \"corporateRelocation\": false,\n    \"salesPrice\": 225000.0,\n    \"numberOfStories\": 1,\n    \"numberOfUnits\": \"OneUnit\",\n    \"construction\": false\n  },\n  \"representativeFICO\": 850,\n  \"loanLevelDebtToIncomeRatio\": 18.0,\n  \"customerInternalId\": \"OBSearch\"\n}"
 
     xhr.open('POST', url);
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.onreadystatechange = () => {
-        // Only run if the request is complete
         if (xhr.readyState !== 4) return;
-    
-        // Process our return data
         if (xhr.status >= 200 && xhr.status < 300) {
-            // What do when the request is successful
-            console.log(JSON.parse(xhr.responseText));
+            let productDetails = JSON.parse(xhr.responseText)['productDetails'];
+            present(productDetails);
         }
     };
     xhr.send(payload);
 }
 
-function present() {
+function present(productDetails) {
+    loader.style.display = 'none';
     addEditorButtonOnclick();
-    presentationPage.style.display = 'block';
+    presentationPage.style.display = 'block'; 
     formPage.style.display = 'none';
     nextBtn.style.display = 'none';
     backBtn.style.display = 'none';
+    buildPresentation(productDetails);
+}
 
-    let clone = clonee.cloneNode(true);
-    presentationPage.appendChild(clone);
+// wip
+function buildPresentation(productDetails) {
+    buildProposedRatesDisplay(productDetails);
+    buildTable(productDetails);
+}
+
+function buildProposedRatesDisplay(productDetails) {
+    let quotes = productDetails['quotes'];
+    let proposedQuotes = getProposedQuotes(quotes);
+    let presentation = document.createElement('div');
+    let proposedRates = document.createElement('div');
+    let title = document.createElement('h1');
+    title.innerHTML = 'Test Title 1';
+
+    presentation.classList.add('presentation');
+    proposedRates.classList.add('proposed-rates');
+
+    proposedQuotes.forEach(quote => {
+        buildProposedRatesDisplayDetails(proposedRates, quote);
+    });
+    presentation.appendChild(title);
+    presentation.appendChild(proposedRates);
+    presentationPage.appendChild(presentation);
+}
+
+function buildProposedRatesDisplayDetails(wrapper, quote) {
+    let proposedRate = document.createElement('div');
+    let title = document.createElement('h4');
+    let rateDetailWrapper = document.createElement('div');
+
+    rateDetailWrapper.classList.add('rate-details');
+    proposedRate.classList.add('proposed-rate');
+    title.innerHTML = 'Test Title';
+
+    let rate = quote['rate'];
+    let apr = quote['apr'];
+    let closingCost = quote['closingCost'];
+    let monthlyPayment = quote['totalPayment'];
+
+    let rateTitle = document.createElement('h6');
+    let closingCostTitle  = document.createElement('h6');
+    let monthlyPaymentTitle = document.createElement('h6');
+
+    rateTitle.innerHTML = 'Rate';
+    closingCostTitle.innerHTML = 'Closing Costs';
+    monthlyPaymentTitle.innerHTML = 'Monthly Payment';
+
+    let rateDatum = document.createElement('p');
+    let aprDatum = document.createElement('p');
+    let closingCostDatum = document.createElement('p');
+    let monthlyPaymentDatum = document.createElement('p');
+
+    rateDatum.classList.add('rate-value');
+    aprDatum.classList.add('apr-value');
+    aprDatum.classList.add('apr-detail');
+    closingCostDatum.classList.add('closing-costs-value');
+    monthlyPaymentDatum.classList.add('monthly-payment-value');
+
+    rateDatum.innerHTML = rate;
+    aprDatum.innerHTML = apr;
+    closingCostDatum.innerHTML = closingCost;
+    monthlyPaymentDatum.innerHTML = monthlyPayment;
+
+    let rateDetailRate = document.createElement('div');
+    let rateDetailclosingCost = document.createElement('div');
+    let rateDetailMonthlyPayment = document.createElement('div');
+
+    rateDetailRate.appendChild(rateTitle);
+    rateDetailclosingCost.appendChild(closingCostTitle);
+    rateDetailMonthlyPayment.appendChild(monthlyPaymentTitle);
+
+    let rateDetails = [rateDetailRate, rateDetailclosingCost, rateDetailMonthlyPayment];
+
+    rateDetailRate.appendChild(rateDatum);
+    rateDetailRate.appendChild(aprDatum);
+    rateDetailclosingCost.appendChild(closingCostDatum);
+    rateDetailMonthlyPayment.appendChild(monthlyPaymentDatum);
+
+    rateDetails.forEach(rateDetail => {
+        rateDetail.classList.add('rate-detail');
+        rateDetailWrapper.appendChild(rateDetail);
+    });
+
+    proposedRate.appendChild(title);
+    proposedRate.appendChild(rateDetailWrapper);
+    wrapper.appendChild(proposedRate);
+}
+
+function getProposedQuotes(quotes) {
+    let lowRate = quotes[0];
+    let midRate = quotes[quotes.length/2];
+    let highRate = quotes[quotes.length-1];
+    return [lowRate, midRate, highRate];
+}
+
+
+function buildTable(productDetails) {
+    let quotes = productDetails['quotes'];
+    quotes.forEach(quote => {
+        let rate = {
+            'value': quote['rate'],
+            'label': '%'
+        };
+        let closingCost = {
+            'value': quote['closingCost'],
+            'label': '$'
+        };
+        let principalAndInterest = {
+            'value': quote['principalAndInterest'],
+            'label': '$'
+        };
+        let apr = {
+            'value': quote['apr'],
+            'label': '%'
+        };
+        let data = [rate, closingCost, principalAndInterest, apr];
+
+        let row = document.createElement('tr');
+        data.forEach(datum => {
+            let td = document.createElement('td');
+            let v = datum['value'];
+            let l = datum['label'];
+            td.innerHTML = l === '$' ? l + v : v + l;
+            td.classList.add('td');
+            row.appendChild(td);
+        });
+        let link = document.createElement('a');
+        link.innerHTML = 'See details';
+        link.href = '#';
+        row.appendChild(link);
+        tbody.appendChild(row);
+    });
+    addExtendRatesBtnOnclick();
+}
+
+function addExtendRatesBtnOnclick() {
+    expandRatesBtn.onclick = () => {
+        let isExpanded = ratesTableWrapper.style.height === 'auto';
+        ratesTableWrapper.style.height = isExpanded ? '24rem' : 'auto';
+        gradient.style.display = isExpanded ? 'block' : 'none';
+        expandRatesBtn.innerHTML = isExpanded ? 'Show more rates' : 'Show less rates';
+    };
+}
+
+function loading() {
+    formPage.style.display = 'none';
+    nextBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+    loader.style.display = 'block';
 }
 
 // wip
