@@ -898,42 +898,43 @@ function present(productDetails) {
     formPage.style.display = 'none';
     nextBtn.style.display = 'none';
     backBtn.style.display = 'none';
+
+    // wip
+    // this needs to repeat for every product
     buildPresentation(productDetails);
 }
 
-// wip
 function buildPresentation(productDetails) {
-    buildProposedRatesDisplay(productDetails);
-    buildTable(productDetails);
-}
-
-function buildProposedRatesDisplay(productDetails) {
     let quotes = productDetails['quotes'];
+    let title = productDetails['productName'];
     let proposedQuotes = getProposedQuotes(quotes);
+    let proposedQuotesTitles = ['Low rate', 'Rate with balanced costs & payments', 'Rate with low closing costs'];
     let presentation = document.createElement('div');
     let proposedRates = document.createElement('div');
-    let title = document.createElement('h1');
-    title.innerHTML = 'Test Title 1';
+    let titleElm = document.createElement('h1');
+    titleElm.innerHTML = title;
 
     presentation.classList.add('presentation');
     proposedRates.classList.add('proposed-rates');
 
-    proposedQuotes.forEach(quote => {
-        buildProposedRatesDisplayDetails(proposedRates, quote);
-    });
-    presentation.appendChild(title);
+    for (let i = 0; i < proposedQuotes.length; i++) {
+        buildProposedRatesDisplayDetails(proposedRates, proposedQuotesTitles[i], proposedQuotes[i]);
+    }
+
+    presentation.appendChild(titleElm);
     presentation.appendChild(proposedRates);
+    buildTable(presentation, productDetails);
     presentationPage.appendChild(presentation);
 }
 
-function buildProposedRatesDisplayDetails(wrapper, quote) {
+function buildProposedRatesDisplayDetails(wrapper, title, quote) {
     let proposedRate = document.createElement('div');
-    let title = document.createElement('h4');
+    let titleElm = document.createElement('h4');
     let rateDetailWrapper = document.createElement('div');
 
     rateDetailWrapper.classList.add('rate-details');
     proposedRate.classList.add('proposed-rate');
-    title.innerHTML = 'Test Title';
+    titleElm.innerHTML = title;
 
     let rate = quote['rate'];
     let apr = quote['apr'];
@@ -984,20 +985,62 @@ function buildProposedRatesDisplayDetails(wrapper, quote) {
         rateDetailWrapper.appendChild(rateDetail);
     });
 
-    proposedRate.appendChild(title);
+    proposedRate.appendChild(titleElm);
     proposedRate.appendChild(rateDetailWrapper);
     wrapper.appendChild(proposedRate);
 }
 
 function getProposedQuotes(quotes) {
     let lowRate = quotes[0];
-    let midRate = quotes[quotes.length/2];
+    let midRate = quotes[parseInt(quotes.length/2)];
     let highRate = quotes[quotes.length-1];
     return [lowRate, midRate, highRate];
 }
 
+function buildTable(presentation, productDetails) {
+    let rates = document.createElement('div');
+    let title = document.createElement('h4');
+    let ratesTable = document.createElement('div');
+    let table = document.createElement('table');
+    let thead = document.createElement('thead');
+    let tbody = document.createElement('tbody');
+    let tr = document.createElement('tr');
+    let gradient = document.createElement('div');
 
-function buildTable(productDetails) {
+    rates.classList.add('rates');
+    ratesTable.classList.add('rates-table')
+    gradient.classList.add('gradient');
+    title.innerHTML = 'Full range of rates';
+
+    let rateTitle = document.createElement('th');
+    let ccTitle = document.createElement('th');
+    let mpiTitle = document.createElement('th');
+    let aprTitle = document.createElement('th');
+    let detailsTitle = document.createElement('th');
+
+    rateTitle.innerHTML = 'Rate';
+    ccTitle.innerHTML = 'Closing Costs';
+    mpiTitle.innerHTML = 'Monthly P&I';
+    aprTitle.innerHTML = 'APR';
+    detailsTitle.innerHTML = 'Details';
+
+    let headers = [rateTitle, ccTitle, mpiTitle, aprTitle, detailsTitle];
+    headers.forEach(h => tr.appendChild(h));
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    buildTableBody(tbody, productDetails)
+    table.appendChild(tbody);
+    ratesTable.appendChild(table);
+    ratesTable.appendChild(gradient);
+    rates.appendChild(title);
+    rates.appendChild(ratesTable);
+    buildExtendRatesBtn(ratesTable, gradient, rates);
+
+    presentation.appendChild(rates);
+}
+
+function buildTableBody(tbody, productDetails) {
     let quotes = productDetails['quotes'];
     quotes.forEach(quote => {
         let rate = {
@@ -1033,16 +1076,23 @@ function buildTable(productDetails) {
         row.appendChild(link);
         tbody.appendChild(row);
     });
-    addExtendRatesBtnOnclick();
 }
 
-function addExtendRatesBtnOnclick() {
-    expandRatesBtn.onclick = () => {
-        let isExpanded = ratesTableWrapper.style.height === 'auto';
-        ratesTableWrapper.style.height = isExpanded ? '24rem' : 'auto';
+function buildExtendRatesBtn(tableWrapper, gradient, rates) {
+    let btn = document.createElement('button');
+    btn.classList.add('expand-rates-btn');
+    btn.innerHTML = 'Show all rates';
+    addExtendRatesBtnOnclick(tableWrapper, gradient, btn);
+    rates.appendChild(btn);
+}
+
+function addExtendRatesBtnOnclick(tableWrapper, gradient, btn) {
+    btn.onclick = () => {
+        let isExpanded = tableWrapper.style.height === 'auto';
+        tableWrapper.style.height = isExpanded ? '24rem' : 'auto';
         gradient.style.display = isExpanded ? 'block' : 'none';
-        expandRatesBtn.innerHTML = isExpanded ? 'Show more rates' : 'Show less rates';
-    };
+        btn.innerHTML = isExpanded ? 'Show more rates' : 'Show less rates';
+    }
 }
 
 function loading() {

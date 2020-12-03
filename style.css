@@ -270,6 +270,7 @@ a {
 .rates-table {
     overflow: hidden;
     height: 24rem;
+    /*height: auto;*/
 }
 
 .rates-table > table {
@@ -316,6 +317,32 @@ a {
     background-color: #0e508b;
     color: white;
 }
+
+.expand-rates-btn {
+    margin: 1rem 0;
+    padding: .5rem 1rem;
+    border: 2px solid #0e508b;
+    background-color: inherit;
+    color: #0e508b;
+    border-radius: .25rem;
+    position: relative;
+    z-index: 100;
+}
+
+.expand-rates-btn:focus {
+    outline: 0;
+}
+
+.expand-rates-btn:hover {
+    background-color: #bed7ed;
+    cursor: pointer;
+}
+
+.expand-rates-btn:active {
+    background-color: #0e508b;
+    color: white;
+}
+
 
 .gradient {
     left: 0;
