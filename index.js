@@ -391,7 +391,7 @@ function addZipFilterEventListener(input) {
 
 function addZipValidationEventListener(input, question) {
     input.addEventListener('keyup', event => {
-        let state = getStateFromZip(input.value);
+        let state = getStateAbbFromZip(input.value);
     
         if (state === answers['state']) {
             question['completed'] = true;
@@ -416,7 +416,7 @@ function addZipWarningEventListener(input, question) {
     });
 }
 
-function getStateFromZip(zipcode) {
+function getStateAbbFromZip(zipcode) {
     // Ensure you don't parse codes that start with 0 as octal values
     zipcode = parseInt(zipcode,10);
 
@@ -484,7 +484,7 @@ function getStateFromZip(zipcode) {
     } else if (state.length > 1) {
         console.error("Found two states");
     }
-    return state[0].long.toLowerCase();
+    return state[0].code;
 }
 
 function handleTypeTextfield(question) {
@@ -822,8 +822,6 @@ function replacePurchaseField() {
     }
 }
 
-// For handling next/back functionality
-
 function next() {
     let currentQuestion = getCurrentQuestion();
     if (currentQuestion['completed']) {
@@ -836,7 +834,8 @@ function next() {
         if (currentQuestionIndex <= questionCount) {
             currentQuestionIndex++;
             display();
-        }    
+        }
+        console.log(answers);
     }
 }
 
@@ -875,6 +874,7 @@ function submit() {
 
 function getXhrRates() {
     let xhr = new XMLHttpRequest();
+    // wip
     // this will need to be obscured in final code
     let url = 'https://he6qq2q8ac.execute-api.us-east-2.amazonaws.com/prod';
     let payload = "{\n  \"borrowerInformation\": {\n    \"assetDocumentation\": \"Verified\",\n    \"debtToIncomeRatio\": 15.0,\n    \"pledgedAssets\": false,\n    \"citizenship\": \"USCitizen\",\n    \"employmentDocumentation\": \"Verified\",\n    \"fico\": 850,\n    \"firstName\": \"test\",\n    \"lastName\": \"test1\",\n    \"vaFirstTimeUse\": true,\n    \"firstTimeHomeBuyer\": false,\n    \"incomeDocumentation\": \"Verified\",\n    \"monthlyIncome\": 0.0,\n    \"monthsReserves\": 24,\n    \"selfEmployed\": true,\n    \"waiveEscrows\": false,\n    \"mortgageLatesX30\": 0,\n    \"mortgageLatesX60\": 0,\n    \"mortgageLatesX90\": 0,\n    \"mortgageLatesX120\": 0,\n    \"mortgageLatesRolling\": 0,\n    \"bankruptcy\": \"Never\",\n    \"foreclosure\": \"Never\",\n    \"bankStatementsForIncome\": \"NotApplicable\"\n  },\n  \"loanInformation\": {\n    \"loanPurpose\": \"Purchase\",\n    \"lienType\": \"First\",\n    \"amortizationTypes\": [\n      \"Fixed\"\n    ],\n    \"armFixedTerms\": [\n      \"FiveYear\"\n    ],\n    \"automatedUnderwritingSystem\": \"NotSpecified\",\n    \"borrowerPaidMI\": \"Yes\",\n    \"buydown\": \"None\",\n    \"cashOutAmount\": 0.0,\n    \"desiredLockPeriod\": 0,\n    \"desiredPrice\": 0.0,\n    \"desiredRate\": 0.0,\n    \"feesIn\": \"No\",\n    \"expandedApprovalLevel\": \"NotApplicable\",\n    \"fhaCaseAssigned\": \"2017-02-06T06:00:00Z\",\n    \"fhaCaseEndorsement\": \"2017-02-06T06:00:00Z\",\n    \"interestOnly\": false,\n    \"baseLoanAmount\": 150000.0,\n    \"secondLienAmount\": 0.0,\n    \"helocDrawnAmount\": 0.0,\n    \"helocLineAmount\": 0.0,\n    \"loanTerms\": [\n      \"ThirtyYear\",\n      \"TwentyFiveYear\"\n    ],\n    \"loanType\": \"Conventional\",\n    \"prepaymentPenalty\": \"None\",\n    \"exemptFromVAFundingFee\": false,\n    \"includeLOCompensationInPricing\": \"YesLenderPaid\",\n    \"calculateTotalLoanAmount\": true\n  },\n  \"propertyInformation\": {\n    \"appraisedValue\": 225000.0,\n    \"occupancy\": \"PrimaryResidence\",\n    \"propertyStreetAddress\": \"string\",\n    \"county\": \"Collin\",\n    \"state\": \"TX\",\n    \"zipCode\": \"75024\",\n    \"propertyType\": \"SingleFamily\",\n    \"corporateRelocation\": false,\n    \"salesPrice\": 225000.0,\n    \"numberOfStories\": 1,\n    \"numberOfUnits\": \"OneUnit\",\n    \"construction\": false\n  },\n  \"representativeFICO\": 850,\n  \"loanLevelDebtToIncomeRatio\": 18.0,\n  \"customerInternalId\": \"OBSearch\"\n}"
@@ -884,14 +884,15 @@ function getXhrRates() {
     xhr.onreadystatechange = () => {
         if (xhr.readyState !== 4) return;
         if (xhr.status >= 200 && xhr.status < 300) {
-            let productDetails = JSON.parse(xhr.responseText)['productDetails'];
-            present(productDetails);
+            let productDetailsList = JSON.parse(xhr.responseText)['productDetailsList'];
+            console.log(productDetailsList);
+            present(productDetailsList);
         }
     };
     xhr.send(payload);
 }
 
-function present(productDetails) {
+function present(productDetailsList) {
     loader.style.display = 'none';
     addEditorButtonOnclick();
     presentationPage.style.display = 'block'; 
@@ -901,7 +902,9 @@ function present(productDetails) {
 
     // wip
     // this needs to repeat for every product
-    buildPresentation(productDetails);
+    for (let productDetails of productDetailsList) {
+        buildPresentation(productDetails);
+    }
 }
 
 function buildPresentation(productDetails) {
@@ -1102,6 +1105,7 @@ function loading() {
     loader.style.display = 'block';
 }
 
+// Editor handling
 // wip
 function addEditorButtonOnclick() {
     let editorBtn = document.getElementById('editorBtn');
@@ -1125,10 +1129,56 @@ function handleEditor() {
     let editorBody = document.getElementById('editorBody');
     editorBody.innerHTML = '';
     formFields.forEach(field => {
-        let newTitle = document.createElement('p');
-        newTitle.innerHTML = field['editorText'];
-        editorBody.appendChild(newTitle);
+        // let newTitle = document.createElement('p');
+        // newTitle.innerHTML = field['editorText'];
+        // editorBody.appendChild(newTitle);
+
+        handleEditorFields(field, editorBody);
     });
+}
+
+function handleEditorFields(field, editorBody) {
+    handleEditorTypeOptions(field, editorBody);
+}
+
+function handleEditorTypeOptions(field, editorBody) {
+    if (field['type'] === 'options' || field['type'] === 'options-long') {
+        let wrapper = document.createElement('div');
+        let input = document.createElement('input');
+        let label = document.createElement('label');
+        let ul = document.createElement('ul')
+
+        input.type = 'checkbox';
+        input.classList.add('editor-options-checkbox');
+        input.name = field['name'];
+        input.id = field['name'];
+        label.htmlFor = field['name'];
+        label.innerHTML = field['editorText'];
+        label.classList.add('editor-options-label');
+        ul.classList.add('editor-options-ul');
+        wrapper.classList.add('editor-options-wrapper');
+
+        for (let option of field['fields']) {
+            let li = document.createElement('li');
+            let btn = document.createElement('button');
+            btn.type = 'button';
+            btn.innerHTML = option['text'];
+            btn.value = option['value'];
+            btn.classList.add('editor-options-btn');
+            btn.onclick = () => {
+                let buttons = ul.querySelectorAll('button');
+                buttons.forEach(button => button.classList.remove('editor-options-selected'));
+                btn.classList.add('editor-options-selected');
+            }
+            li.appendChild(btn)
+            ul.appendChild(li);
+        }
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        wrapper.appendChild(ul);
+        editorBody.appendChild(wrapper);
+    }
 }
 
 function showProgress() {

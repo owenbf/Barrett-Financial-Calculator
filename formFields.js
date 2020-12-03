@@ -8,12 +8,12 @@ export let formFields = [
             {
                 "text": "Refinance",
                 "icon": "mortgage.svg",
-                "value": "refinance"
+                "value": "Refinance"
             },
             {
                 "text": "Purchase",
                 "icon": "home.svg",
-                "value": "purchase"
+                "value": "Purchase"
             }
         ],
         "completed": false
@@ -27,17 +27,17 @@ export let formFields = [
             {
                 "text": "Primary Residence",
                 "icon": "home.svg",
-                "value": "primaryResidence"
+                "value": "PrimaryResidence"
             },
             {
                 "text": "Second Home",
                 "icon": "houses.svg",
-                "value": "secondHome"
+                "value": "SecondHome"
             },
             {
                 "text": "Investment",
                 "icon": "value.svg",
-                "value": "investment"
+                "value": "Investment"
             }
         ],
         "completed": false
@@ -51,22 +51,22 @@ export let formFields = [
             {
                 "text": "Single Family",
                 "icon": "home.svg",
-                "value": "singleFamily"
+                "value": "SingleFamily"
             },
             {
                 "text": "Townhouse",
                 "icon": "townhouse.svg",
-                "value": "townhouse"
+                "value": "Townhouse"
             },
             {
                 "text": "2-4 Unit Duplex",
                 "icon": "duplex.svg",
-                "value": "duplex"
+                "value": "Duplex"
             },
             {
                 "text": "Condominium",
                 "icon": "condominium.svg",
-                "value": "condominium"
+                "value": "Condominium"
             }
         ],
         "completed": false
@@ -96,43 +96,43 @@ export let formFields = [
         "fields": [
             {
                 "text": "Arizona",
-                "value": "arizona"
+                "value": "AZ"
             },
             {
                 "text": "California",
-                "value": "california"
+                "value": "CA"
             },
             {
                 "text": "Colorado",
-                "value": "colorado"
+                "value": "CO"
             },
             {
                 "text": "Washington",
-                "value": "washington"
+                "value": "WA"
             },
             {
                 "text": "Utah",
-                "value": "utah"
+                "value": "UT"
             },
             {
                 "text": "Texas",
-                "value": "texas"
+                "value": "TX"
             },
             {
                 "text": "Nevada",
-                "value": "nevada"
+                "value": "NV"
             },
             {
                 "text": "Florida",
-                "value": "florida"
+                "value": "FL"
             },
             {
                 "text": "Oregon",
-                "value": "oregon"
+                "value": "OR"
             },
             {
                 "text": "Michigan",
-                "value": "michigan"
+                "value": "MI"
             }
         ],
         "completed": false
@@ -170,52 +170,52 @@ export let formFields = [
             {
                 "text": "Excellent+",
                 "subtext": "760+",
-                "value": "excellent+"
+                "value": "800"
             },
             {
                 "text": "Excellent",
                 "subtext": "740-759",
-                "value": "excellent"
+                "value": "750"
             },
             {
                 "text": "Very Good+",
                 "subtext": "720-739",
-                "value": "verygood+"
+                "value": "730"
             },
             {
                 "text": "Very Good",
                 "subtext": "700-719",
-                "value": "verygood"
+                "value": "710"
             },
             {
                 "text": "Good+",
                 "subtext": "680-699",
-                "value": "good+"
+                "value": "690"
             },
             {
                 "text": "Good",
                 "subtext": "660-679",
-                "value": "good"
+                "value": "670"
             },
             {
                 "text": "Decent+",
                 "subtext": "640-659",
-                "value": "decent+"
+                "value": "650"
             },
             {
                 "text": "Decent",
                 "subtext": "620-639",
-                "value": "decent"
+                "value": "630"
             },
             {
                 "text": "Fair+",
                 "subtext": "600-619",
-                "value": "fair+"
+                "value": "610"
             },
             {
                 "text": "Fair",
                 "subtext": "599 & below",
-                "value": "fair"
+                "value": "550"
             }
         ],
         "completed": false
@@ -336,6 +336,7 @@ export let militaryFields = [
         "type": "options",
         "name": "isVALoan",
         "from": "militaryFields",
+        "editorText": "Refinanced loan is a VA loan",
         "fields": [
             {
                 "text": "Yes",
@@ -353,6 +354,7 @@ export let militaryFields = [
         "type": "options",
         "name": "isVAFirstTime",
         "from": "militaryFields",
+        "editorText": "First time use",
         "fields": [
             {
                 "text": "Yes",
@@ -370,6 +372,7 @@ export let militaryFields = [
         "type": "options",
         "name": "isVAFundingFeeExempt",
         "from": "militaryFields",
+        "editorText": "VA funding fee exempt",
         "fields": [
             {
                 "text": "Yes",
